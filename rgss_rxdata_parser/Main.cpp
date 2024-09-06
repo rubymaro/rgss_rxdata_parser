@@ -1,12 +1,19 @@
 #include <cstdio>
 
+enum
+{
+	RUBY_MARSHAL_MAJOR = 4,
+	RUBY_MARSHAL_MINOR = 8,
+};
+
 int wmain(const int argc, const wchar_t* argv[])
 {
 	FILE* pFile = nullptr;
 	errno_t err;
 	long size;
-	char* paBuf;
+	char* paBuf = nullptr;
 	size_t readByte;
+	char* pCur;
 
 	do
 	{
@@ -23,19 +30,35 @@ int wmain(const int argc, const wchar_t* argv[])
 		paBuf = new char[size];
 
 		readByte = fread_s(paBuf, size, sizeof(char), size, pFile);
+		fclose(pFile);
 
-		delete[] paBuf;
+		pCur = paBuf;
+		if (*pCur != RUBY_MARSHAL_MAJOR)
+		{
+			break;
+		}
+		++pCur;
+
+		if (*pCur != RUBY_MARSHAL_MINOR)
+		{
+			break;
+		}
+		++pCur;
+		
 
 		
 
-		fclose(pFile);
+		
 
 		return 0;
 
 
 	} while (0);
 
-
+	if (paBuf != nullptr)
+	{
+		delete[] paBuf;
+	}
 
 	return 1;
 }
