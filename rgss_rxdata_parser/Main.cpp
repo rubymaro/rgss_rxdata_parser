@@ -2,8 +2,37 @@
 
 enum
 {
-	RUBY_MARSHAL_MAJOR = 4,
-	RUBY_MARSHAL_MINOR = 8,
+	MARSHAL_MAJOR = 4,
+	MARSHAL_MINOR = 8,
+
+	TYPE_NIL = '0',
+	TYPE_TRUE = 'T',
+	TYPE_FALSE = 'F',
+	TYPE_FIXNUM = 'i',
+
+	TYPE_EXTENDED = 'e',
+	TYPE_UCLASS = 'C',
+	TYPE_OBJECT = 'o',
+	TYPE_DATA = 'd',
+	TYPE_USERDEF = 'u',
+	TYPE_USRMARSHAL = 'U',
+	TYPE_FLOAT = 'f',
+	TYPE_BIGNUM = 'l',
+	TYPE_STRING = '"',
+	TYPE_REGEXP = '/',
+	TYPE_ARRAY = '[',
+	TYPE_HASH = '{',
+	TYPE_HASH_DEF = '}',
+	TYPE_STRUCT = 'S',
+	TYPE_MODULE_OLD = 'M',
+	TYPE_CLASS = 'c',
+	TYPE_MODULE = 'm',
+
+	TYPE_SYMBOL = ':',
+	TYPE_SYMLINK = ';',
+
+	TYPE_IVAR = 'I',
+	TYPE_LINK = '@',
 };
 
 int wmain(const int argc, const wchar_t* argv[])
@@ -33,13 +62,13 @@ int wmain(const int argc, const wchar_t* argv[])
 		fclose(pFile);
 
 		pCur = paBuf;
-		if (*pCur != RUBY_MARSHAL_MAJOR)
+		if (*pCur != MARSHAL_MAJOR)
 		{
 			break;
 		}
 		++pCur;
 
-		if (*pCur != RUBY_MARSHAL_MINOR)
+		if (*pCur != MARSHAL_MINOR)
 		{
 			break;
 		}
