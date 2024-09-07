@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <cassert>
 
 enum
 {
@@ -35,14 +36,39 @@ enum
 	TYPE_LINK = '@',
 };
 
+bool Parse(char* paBuf, long bufSize)
+{
+	assert(paBuf != nullptr);
+	char* pCur = paBuf;
+	
+	pCur = paBuf;
+	if (*pCur != MARSHAL_MAJOR)
+	{
+		return false;
+	}
+	++pCur;
+
+	if (*pCur != MARSHAL_MINOR)
+	{
+		return false;
+	}
+	++pCur;
+
+	if (paBuf != nullptr)
+	{
+		delete[] paBuf;
+	}
+
+	return true;
+}
+
 int wmain(const int argc, const wchar_t* argv[])
 {
 	FILE* pFile = nullptr;
 	errno_t err;
-	long size;
-	char* paBuf = nullptr;
+	long bufSize;
 	size_t readByte;
-	char* pCur;
+	char* paBuf = nullptr;
 
 	do
 	{
@@ -53,41 +79,24 @@ int wmain(const int argc, const wchar_t* argv[])
 		}
 
 		fseek(pFile, 0, SEEK_END);
-		size = ftell(pFile);
+		bufSize = ftell(pFile);
 		fseek(pFile, 0, SEEK_SET);
 
-		if (size < 2)
+		if (bufSize < 2)
 		{
 			break;
 		}
 
-		paBuf = new char[size];
-
-		readByte = fread_s(paBuf, size, sizeof(char), size, pFile);
+		paBuf = new char[bufSize];
+		readByte = fread_s(paBuf, bufSize, sizeof(char), bufSize, pFile);
 		fclose(pFile);
+		assert(readByte == bufSize);
 
-		pCur = paBuf;
-		if (*pCur != MARSHAL_MAJOR)
-		{
-			break;
-		}
-		++pCur;
-
-		if (*pCur != MARSHAL_MINOR)
-		{
-			break;
-		}
-		++pCur;
-
-		return 0;
-
+		Parse(paBuf, bufSize);
 
 	} while (0);
 
-	if (paBuf != nullptr)
-	{
-		delete[] paBuf;
-	}
+	delete[] paBuf;
 
 	return 1;
 }
