@@ -94,9 +94,11 @@ int wmain(const int argc, const wchar_t* argv[])
 
 		Parse(paBuf, bufSize);
 
-	} while (0);
+		delete[] paBuf;
 
-	delete[] paBuf;
+		return 0;
+
+	} while (0);	
 
 	return 1;
 }
