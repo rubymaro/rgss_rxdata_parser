@@ -54,11 +54,6 @@ bool Parse(char* paBuf, long bufSize)
 	}
 	++pCur;
 
-	if (paBuf != nullptr)
-	{
-		delete[] paBuf;
-	}
-
 	return true;
 }
 
