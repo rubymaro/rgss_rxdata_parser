@@ -36,25 +36,25 @@ enum
 	TYPE_LINK = '@',
 };
 
-bool Parse(char* paBuf, unsigned int bufSize)
+bool Parse(const char* const paBuf, unsigned int bufSize)
 {
 	assert(paBuf != nullptr);
-	char* pCur = paBuf;
+	const char* pToken = paBuf;
 	
-	pCur = paBuf;
-	if (*pCur != MARSHAL_MAJOR)
+	pToken = paBuf;
+	if (*pToken != MARSHAL_MAJOR)
 	{
 		return false;
 	}
-	++pCur;
+	++pToken;
 
-	if (*pCur != MARSHAL_MINOR)
+	if (*pToken != MARSHAL_MINOR)
 	{
 		return false;
 	}
-	++pCur;
+	++pToken;
 
-
+	
 
 	return true;
 }
