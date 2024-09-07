@@ -36,7 +36,7 @@ enum
 	TYPE_LINK = '@',
 };
 
-bool Parse(char* paBuf, long bufSize)
+bool Parse(char* paBuf, unsigned int bufSize)
 {
 	assert(paBuf != nullptr);
 	char* pCur = paBuf;
@@ -54,6 +54,8 @@ bool Parse(char* paBuf, long bufSize)
 	}
 	++pCur;
 
+
+
 	return true;
 }
 
@@ -61,8 +63,8 @@ int wmain(const int argc, const wchar_t* argv[])
 {
 	FILE* pFile = nullptr;
 	errno_t err;
-	long bufSize;
-	size_t readByte;
+	unsigned int bufSize;
+	unsigned int  readByte;
 	char* paBuf = nullptr;
 
 	do
@@ -74,7 +76,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		}
 
 		fseek(pFile, 0, SEEK_END);
-		bufSize = ftell(pFile);
+		bufSize = (unsigned int)ftell(pFile);
 		fseek(pFile, 0, SEEK_SET);
 
 		if (bufSize < 2)
@@ -83,7 +85,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		}
 
 		paBuf = new char[bufSize];
-		readByte = fread_s(paBuf, bufSize, sizeof(char), bufSize, pFile);
+		readByte = (unsigned int)fread_s(paBuf, bufSize, sizeof(char), bufSize, pFile);
 		fclose(pFile);
 		assert(readByte == bufSize);
 
