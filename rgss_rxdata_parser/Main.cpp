@@ -36,10 +36,13 @@ enum
 	TYPE_LINK = '@',
 };
 
-bool Parse(const char* const paBuf, unsigned int bufSize)
+bool Parse(const unsigned char* const paBuf, unsigned int bufSize)
 {
 	assert(paBuf != nullptr);
-	const char* pToken = paBuf;
+	assert(bufSize > 0);
+
+	const unsigned char* pToken = paBuf;
+	const unsigned char* const pEnd = paBuf + bufSize;
 	
 	pToken = paBuf;
 	if (*pToken != MARSHAL_MAJOR)
@@ -54,7 +57,22 @@ bool Parse(const char* const paBuf, unsigned int bufSize)
 	}
 	++pToken;
 
-	
+	while (pToken < pEnd)
+	{
+		switch (*pToken)
+		{
+		case TYPE_NIL:
+			// nullptr
+			break;
+		default:
+			
+			break;
+		}
+		
+		int counter = pToken - paBuf;
+
+		++pToken;
+	}
 
 	return true;
 }
@@ -65,11 +83,11 @@ int wmain(const int argc, const wchar_t* argv[])
 	errno_t err;
 	unsigned int bufSize;
 	unsigned int  readByte;
-	char* paBuf = nullptr;
+	unsigned char* paBuf = nullptr;
 
 	do
 	{
-		err = _wfopen_s(&pFile, L"nil.rxdata", L"rb");
+		err = _wfopen_s(&pFile, L"Actors.rxdata", L"rb");
 		if (err != 0 || pFile == nullptr)
 		{
 			break;
@@ -84,9 +102,11 @@ int wmain(const int argc, const wchar_t* argv[])
 			break;
 		}
 
-		paBuf = new char[bufSize];
-		readByte = (unsigned int)fread_s(paBuf, bufSize, sizeof(char), bufSize, pFile);
+		paBuf = new unsigned char[bufSize];
+		readByte = (unsigned int)fread_s(paBuf, bufSize, sizeof(unsigned char), bufSize, pFile);
 		fclose(pFile);
+
+		assert(readByte > 0);
 		assert(readByte == bufSize);
 
 		Parse(paBuf, bufSize);
