@@ -36,7 +36,7 @@ enum
 	TYPE_LINK = '@',
 };
 
-bool Parse(const unsigned char* const paBuf, unsigned int bufSize)
+bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 {
 	assert(paBuf != nullptr);
 	assert(bufSize > 0);
@@ -87,7 +87,7 @@ int wmain(const int argc, const wchar_t* argv[])
 
 	do
 	{
-		err = _wfopen_s(&pFile, L"Actors.rxdata", L"rb");
+		err = _wfopen_s(&pFile, L"number.rxdata", L"rb");
 		if (err != 0 || pFile == nullptr)
 		{
 			break;
