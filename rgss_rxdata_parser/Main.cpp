@@ -46,7 +46,7 @@ int wmain(const int argc, const wchar_t* argv[])
 
 	do
 	{
-		err = _wfopen_s(&pFile, L"Actors.rxdata", L"rb");
+		err = _wfopen_s(&pFile, L"nil.rxdata", L"rb");
 		if (err != 0 || pFile == nullptr)
 		{
 			break;
@@ -55,6 +55,11 @@ int wmain(const int argc, const wchar_t* argv[])
 		fseek(pFile, 0, SEEK_END);
 		size = ftell(pFile);
 		fseek(pFile, 0, SEEK_SET);
+
+		if (size < 2)
+		{
+			break;
+		}
 
 		paBuf = new char[size];
 
@@ -73,11 +78,6 @@ int wmain(const int argc, const wchar_t* argv[])
 			break;
 		}
 		++pCur;
-		
-
-		
-
-		
 
 		return 0;
 
