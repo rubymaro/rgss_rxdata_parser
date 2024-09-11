@@ -53,43 +53,51 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 
 	switch (followingByte)
 	{
-	case '\x00': // 0
+	case 0x00: // 0
 		*outVal = 0;
 		(*ppToken) += 1;
 		return true;
-	case '\x01': // [0x7B, 0xFF]
+	case 0x01: // unsigned [0x7B, 0xFF]
 		*outVal = (*ppToken)[1];
 		(*ppToken) += 2;
 		return true;
-	case '\x02': // [0x0100, 0xFFFF]
+	case 0x02: // unsigned [0x0100, 0xFFFF]
 		*outVal = (*ppToken)[1] | (*ppToken)[2] << 8;
 		(*ppToken) += 3;
 		break;
-	case '\x03': // [0x010000, 0xFFFFFF]
+	case 0x03: // unsigned [0x010000, 0xFFFFFF]
 		*outVal = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
 		(*ppToken) += 4;
 		break;
-	case '\x04': // [0x01000000, 0x3FFFFFFF]
+	case 0x04: // unsigned [0x01000000, 0x3FFFFFFF]
 		*outVal = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16 | (*ppToken)[4] << 24;
 		(*ppToken) += 5;
 		break;
-	case '\xff':
+	case 0xFF: // signed [0x00, 0x84] => [-256, -124]
+		*outVal = -(((~((*ppToken)[1])) & 0x000000ff) + 1);
+		(*ppToken) += 2;
 		break;
-	case '\xfe':
+	case 0xFE:
+		*outVal = -(((~((*ppToken)[1] | (*ppToken)[2] << 8)) & 0x0000ffff) + 1);
+		(*ppToken) += 3;
 		break;
-	case '\xfd':
+	case 0xFD:
 		break;
-	case '\xfc':
+	case 0xFC:
 		break;
 	default:
 	{
-		if (followingByte > 0x05 && followingByte <= 0x7F)
+		if (followingByte >= 0x06 && followingByte <= 0x7F)
 		{
-			return followingByte - 0x05; // [0x01, 0x7A]
+			*outVal = (char)(followingByte - 0x05); // unsigned [0x01, 0x7A]
+			(*ppToken) += 1;
+			return true;
 		}
-		else
+		else if (followingByte >= 0x80 && followingByte <= 0xFA) 
 		{
-
+			*outVal = (char)(followingByte + 0x05); // signed [0x85, 0xFF] = [-123, -1]
+			(*ppToken) += 1;
+			return true;
 		}
 		break;
 	}
@@ -147,8 +155,17 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 
 int wmain(const int argc, const wchar_t* argv[])
 {
-	OpenFile(L"06_Fixnum_16777216.rxdata");
-	OpenFile(L"06_Fixnum_16777217.rxdata");
+	//OpenFile(L"06_Fixnum_16777216.rxdata");
+	//OpenFile(L"06_Fixnum_16777217.rxdata");
+	//OpenFile(L"07_Fixnum_-1.rxdata");
+	//OpenFile(L"07_Fixnum_-123.rxdata");
+	//OpenFile(L"07_Fixnum_-124.rxdata");
+	//OpenFile(L"07_Fixnum_-256.rxdata");
+	OpenFile(L"07_Fixnum_-257.rxdata");
+	OpenFile(L"08_Fixnum_-65534.rxdata");
+	OpenFile(L"08_Fixnum_-65535.rxdata");
+	OpenFile(L"08_Fixnum_-65536.rxdata");
+	OpenFile(L"08_Fixnum_-65537.rxdata");
 
 	return 0;
 }
