@@ -105,7 +105,7 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 		}
 		else if (followingByte >= 0x80 && followingByte <= 0xFA) 
 		{
-			fixnum = static_cast<char>(followingByte + 0x05); // signed [0x85, 0xFF] = [-123, -1]
+			fixnum = static_cast<char>(followingByte + 0x05); // signed [0x85, 0xFF] => [-123, -1]
 			(*ppToken) += 1;
 		}
 		else
