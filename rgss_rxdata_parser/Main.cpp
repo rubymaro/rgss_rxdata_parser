@@ -49,61 +49,75 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 {
 	++(*ppToken);
 
-	int followingByte = **ppToken;
+	int fixnum = -1;
+	int followingByte = (*ppToken)[0];
 
 	switch (followingByte)
 	{
 	case 0x00: // 0
-		*outVal = 0;
+		fixnum = 0;
 		(*ppToken) += 1;
-		return true;
+		break;
 	case 0x01: // unsigned [0x7B, 0xFF]
-		*outVal = (*ppToken)[1];
+		fixnum = (*ppToken)[1];
 		(*ppToken) += 2;
-		return true;
+		break;
 	case 0x02: // unsigned [0x0100, 0xFFFF]
-		*outVal = (*ppToken)[1] | (*ppToken)[2] << 8;
+		fixnum = (*ppToken)[1] | (*ppToken)[2] << 8;
 		(*ppToken) += 3;
 		break;
 	case 0x03: // unsigned [0x010000, 0xFFFFFF]
-		*outVal = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
+		fixnum = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
 		(*ppToken) += 4;
 		break;
 	case 0x04: // unsigned [0x01000000, 0x3FFFFFFF]
-		*outVal = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16 | (*ppToken)[4] << 24;
+		__fallthrough;
+
+	case 0xFC: // signed [0xC0000000, 0xFEFFFFFF] => [-1073741824, -16777217]
+		fixnum = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16 | (*ppToken)[4] << 24;
 		(*ppToken) += 5;
 		break;
 	case 0xFF: // signed [0x00, 0x84] => [-256, -124]
-		*outVal = -(((~((*ppToken)[1])) & 0x000000ff) + 1);
+		fixnum = ~(*ppToken)[1];
+		fixnum &= 0x000000ff;
+		fixnum = -(fixnum + 1);
 		(*ppToken) += 2;
 		break;
-	case 0xFE:
-		*outVal = -(((~((*ppToken)[1] | (*ppToken)[2] << 8)) & 0x0000ffff) + 1);
+	case 0xFE: // signed [0x0000, 0xFEFF] => [-65536, -257]
+		fixnum = (*ppToken)[1] | (*ppToken)[2] << 8;
+		fixnum = ~fixnum;
+		fixnum &= 0x0000ffff;
+		fixnum = -(fixnum + 1);
 		(*ppToken) += 3;
 		break;
-	case 0xFD:
-		break;
-	case 0xFC:
+	case 0xFD: // signed [0x000000, 0xFEFFFF] => [-16777216, -65537]
+		fixnum = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
+		fixnum = ~fixnum;
+		fixnum &= 0x00ffffff;
+		fixnum = -(fixnum + 1);
+		(*ppToken) += 4;
 		break;
 	default:
-	{
 		if (followingByte >= 0x06 && followingByte <= 0x7F)
 		{
-			*outVal = (char)(followingByte - 0x05); // unsigned [0x01, 0x7A]
+			fixnum = (char)(followingByte - 0x05); // unsigned [0x01, 0x7A]
 			(*ppToken) += 1;
-			return true;
 		}
 		else if (followingByte >= 0x80 && followingByte <= 0xFA) 
 		{
-			*outVal = (char)(followingByte + 0x05); // signed [0x85, 0xFF] = [-123, -1]
+			fixnum = (char)(followingByte + 0x05); // signed [0x85, 0xFF] = [-123, -1]
 			(*ppToken) += 1;
-			return true;
+		}
+		else
+		{
+			return false;
 		}
 		break;
 	}
-	}
 
-	return false;
+	*outVal = fixnum;
+
+	return true;
 }
 
 bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
@@ -161,11 +175,14 @@ int wmain(const int argc, const wchar_t* argv[])
 	//OpenFile(L"07_Fixnum_-123.rxdata");
 	//OpenFile(L"07_Fixnum_-124.rxdata");
 	//OpenFile(L"07_Fixnum_-256.rxdata");
-	OpenFile(L"07_Fixnum_-257.rxdata");
-	OpenFile(L"08_Fixnum_-65534.rxdata");
-	OpenFile(L"08_Fixnum_-65535.rxdata");
-	OpenFile(L"08_Fixnum_-65536.rxdata");
-	OpenFile(L"08_Fixnum_-65537.rxdata");
+	//OpenFile(L"07_Fixnum_-257.rxdata");
+	//OpenFile(L"08_Fixnum_-65534.rxdata");
+	//OpenFile(L"08_Fixnum_-65535.rxdata");
+	//OpenFile(L"08_Fixnum_-65536.rxdata");
+	//OpenFile(L"08_Fixnum_-65537.rxdata");
+	OpenFile(L"08_Fixnum_-16777215.rxdata");
+	OpenFile(L"08_Fixnum_-16777216.rxdata");
+	OpenFile(L"08_Fixnum_-16777217.rxdata");
 
 	return 0;
 }
