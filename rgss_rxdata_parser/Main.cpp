@@ -121,6 +121,11 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 	return true;
 }
 
+bool ProcessStringUTF8(const unsigned char** ppToken)
+{
+
+}
+
 bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 {
 	assert(paBuf != nullptr);
@@ -160,6 +165,10 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 		case TYPE_FIXNUM:
 			ProcessFixnum(&pToken, &val);
 			break;
+		case TYPE_STRING:
+			++pToken;
+			ProcessStringUTF8(&pToken);
+			break;
 		default:
 			break;
 		}
@@ -185,7 +194,9 @@ int wmain(const int argc, const wchar_t* argv[])
 	//OpenFile(L"08_Fixnum_-16777216.rxdata");
 	//OpenFile(L"08_Fixnum_-16777217.rxdata");
 	//OpenFile(L"08_Fixnum_-1073741824.rxdata");
-	OpenFile(L"08_Fixnum_-1073741825.rxdata");
+	//OpenFile(L"08_Fixnum_-1073741825.rxdata");
+	OpenFile(L"marshals/String_abcd.rxdata");
+	OpenFile(L"marshals/String_0123�����ٶ�ABCD.rxdata");
 
 	return 0;
 }
