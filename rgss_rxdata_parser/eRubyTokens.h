@@ -8,7 +8,7 @@ enum
 	TYPE_NIL = '0',    // void*:nullptr
 	TYPE_TRUE = 'T',   // bool:true
 	TYPE_FALSE = 'F',  // bool:false
-	TYPE_FIXNUM = 'i', // 
+	TYPE_FIXNUM = 'i', // int32_t
 
 	TYPE_EXTENDED = 'e',
 	TYPE_UCLASS = 'C',
