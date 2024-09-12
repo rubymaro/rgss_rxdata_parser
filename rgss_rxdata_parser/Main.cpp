@@ -49,13 +49,13 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 {
 	++(*ppToken);
 
+	const int fixnumHeader = (*ppToken)[0];
 	int fixnum = -1;
-	int followingByte = (*ppToken)[0];
 
-	switch (followingByte)
+	switch (fixnumHeader)
 	{
 	case 0x00: // 0
-		fixnum = 0;
+		fixnum = fixnumHeader;
 		(*ppToken) += 1;
 		break;
 	case 0x01: // unsigned [0x7B, 0xFF]
@@ -98,14 +98,14 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 		(*ppToken) += 4;
 		break;
 	default:
-		if (followingByte >= 0x06 && followingByte <= 0x7F)
+		if (fixnumHeader >= 0x06 && fixnumHeader <= 0x7F)
 		{
-			fixnum = static_cast<char>(followingByte - 0x05); // unsigned [0x01, 0x7A]
+			fixnum = static_cast<char>(fixnumHeader - 0x05); // unsigned [0x01, 0x7A]
 			(*ppToken) += 1;
 		}
-		else if (followingByte >= 0x80 && followingByte <= 0xFA) 
+		else if (fixnumHeader >= 0x80 && fixnumHeader <= 0xFA) 
 		{
-			fixnum = static_cast<char>(followingByte + 0x05); // signed [0x85, 0xFF] => [-123, -1]
+			fixnum = static_cast<char>(fixnumHeader + 0x05); // signed [0x85, 0xFF] => [-123, -1]
 			(*ppToken) += 1;
 		}
 		else
