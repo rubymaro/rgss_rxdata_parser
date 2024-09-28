@@ -123,7 +123,50 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 
 bool ProcessStringUTF8(const unsigned char** ppToken)
 {
+	// skip the string header
+	++(*ppToken);
 
+	const int stringLengthHeader = (*ppToken)[0];
+	size_t utf8ByteLength = 0;
+
+	switch (stringLengthHeader)
+	{
+	case 0x00: // zero length
+		(*ppToken)++;
+		break;
+	case 0x01:
+		utf8ByteLength = (*ppToken)[1];
+		(*ppToken) += 2;
+		break;
+	case 0x02:
+		utf8ByteLength = (*ppToken)[1] | (*ppToken)[2] << 8;
+		(*ppToken) += 3;
+		break;
+	case 0x03:
+		utf8ByteLength = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
+		(*ppToken) += 4;
+		break;
+	case 0x04:
+		utf8ByteLength = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16 | (*ppToken)[4] << 24;
+		(*ppToken) += 5;
+		break;
+	default:
+		if (stringLengthHeader >= 0x05 && stringLengthHeader <= 0xff)
+		{
+			utf8ByteLength = stringLengthHeader - 0x05;
+			(*ppToken) += 1;
+			break;
+		}
+		else
+		{
+			assert(false);
+			return false;
+		}
+	}
+
+	(*ppToken) += utf8ByteLength;
+
+	return true;
 }
 
 bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
@@ -166,7 +209,6 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 			ProcessFixnum(&pToken, &val);
 			break;
 		case TYPE_STRING:
-			++pToken;
 			ProcessStringUTF8(&pToken);
 			break;
 		default:
@@ -195,8 +237,8 @@ int wmain(const int argc, const wchar_t* argv[])
 	//OpenFile(L"08_Fixnum_-16777217.rxdata");
 	//OpenFile(L"08_Fixnum_-1073741824.rxdata");
 	//OpenFile(L"08_Fixnum_-1073741825.rxdata");
-	OpenFile(L"marshals/String_abcd.rxdata");
-	OpenFile(L"marshals/String_0123�����ٶ�ABCD.rxdata");
+	//OpenFile(L"marshals/String_abcd.rxdata");
+	OpenFile(L"marshals/String_0123가나다라ABCD.rxdata");
 
 	return 0;
 }
