@@ -78,9 +78,9 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 		retFixnum = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
 		(*ppToken) += 4;
 		break;
+
 	case 0x04: // unsigned [0x01000000, 0x3FFFFFFF]
 		__fallthrough;
-
 	case 0xFC: // signed [0xC0000000, 0xFEFFFFFF] => [-1073741824, -16777217]
 		retFixnum = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16 | (*ppToken)[4] << 24;
 		(*ppToken) += 5;
@@ -265,6 +265,8 @@ int wmain(const int argc, const wchar_t* argv[])
 	if (ReadBytes(L"marshals/String_0123가나다라ABCD.rxdata", &paBuf, &bufSize))
 	{
 		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
 	}
 
 
