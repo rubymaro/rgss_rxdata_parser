@@ -1,7 +1,9 @@
 ﻿#include <cstdio>
 #include <cassert>
+#include <strsafe.h>
 
 #include "eRubyTokens.h"
+#include <clocale>
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool Parse(const unsigned char* const paBuf, const unsigned int bufSize);
@@ -132,8 +134,12 @@ bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 	return true;
 }
 
-bool ProcessStringUTF8(const unsigned char** ppToken)
+bool ProcessStringUTF8(const unsigned char** ppToken, char** ppaString, size_t* pOutLength)
 {
+	assert(ppToken != nullptr);
+	assert(ppaString != nullptr);
+	assert(pOutLength != nullptr);
+
 	// skip the string header
 	++(*ppToken);
 
@@ -179,6 +185,10 @@ bool ProcessStringUTF8(const unsigned char** ppToken)
 		}
 	}
 
+	*ppaString = new char[utf8ByteLength];
+	memcpy(*ppaString, reinterpret_cast<const char*>(*ppToken), utf8ByteLength);
+	*pOutLength = utf8ByteLength;
+
 	(*ppToken) += utf8ByteLength;
 
 	return true;
@@ -206,6 +216,8 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 	++pToken;
 
 	int val;
+	char* paString = nullptr;
+	size_t stringLength = 0;
 
 	while (pToken < pEnd)
 	{
@@ -213,22 +225,31 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 		{
 		case TYPE_NIL:
 			++pToken;
+			wprintf(L"nil\n");
 			break;
 
 		case TYPE_TRUE:
 			++pToken;
+			wprintf(L"true\n");
 			break;
 
 		case TYPE_FALSE:
 			++pToken;
+			wprintf(L"false\n");
 			break;
 
 		case TYPE_FIXNUM:
 			ProcessFixnum(&pToken, &val);
+			wprintf(L"%d\n", val);
 			break;
 
 		case TYPE_STRING:
-			ProcessStringUTF8(&pToken);
+			ProcessStringUTF8(&pToken, &paString, &stringLength);
+			for (size_t i = 0; i < stringLength; ++i)
+			{
+				wprintf(L"%2x ", (unsigned char)paString[i]);
+			}
+			wprintf(L"\n");
 			break;
 
 		default:
