@@ -4,7 +4,10 @@ enum
 {
 	MARSHAL_MAJOR = 4,
 	MARSHAL_MINOR = 8,
+};
 
+enum class eRubyTokens
+{
 	TYPE_NIL = '0',    // void*:nullptr
 	TYPE_TRUE = 'T',   // bool:true
 	TYPE_FALSE = 'F',  // bool:false

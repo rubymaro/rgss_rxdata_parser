@@ -1,9 +1,12 @@
 ﻿#include <cstdio>
 #include <cassert>
 #include <strsafe.h>
+#include <vector>
 
 #include "eRubyTokens.h"
-#include <clocale>
+#include "Object.h"
+
+std::vector<Object*> gObjectPtrs;
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool Parse(const unsigned char* const paBuf, const unsigned int bufSize);
@@ -221,39 +224,35 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 
 	while (pToken < pEnd)
 	{
-		switch (*pToken)
+		switch ((eRubyTokens)(*pToken))
 		{
-		case TYPE_NIL:
+		case eRubyTokens::TYPE_NIL:
 			++pToken;
-			wprintf(L"nil\n");
+			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_NIL, nullptr));
 			break;
 
-		case TYPE_TRUE:
+		case eRubyTokens::TYPE_TRUE:
 			++pToken;
-			wprintf(L"true\n");
+			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_TRUE, new bool(true)));
 			break;
 
-		case TYPE_FALSE:
+		case eRubyTokens::TYPE_FALSE:
 			++pToken;
-			wprintf(L"false\n");
+			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_FALSE, new bool(false)));
 			break;
 
-		case TYPE_FIXNUM:
+		case eRubyTokens::TYPE_FIXNUM:
 			ProcessFixnum(&pToken, &val);
-			wprintf(L"%d\n", val);
+			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_FIXNUM, new int(val)));
 			break;
 
-		case TYPE_STRING:
+		case eRubyTokens::TYPE_STRING:
 			ProcessStringUTF8(&pToken, &paString, &stringLength);
-			for (size_t i = 0; i < stringLength; ++i)
-			{
-				wprintf(L"%2x ", (unsigned char)paString[i]);
-			}
-			wprintf(L"\n");
+			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_STRING, paString));
 			break;
 
 		default:
-			break;
+			return false;
 		}
 	}
 
@@ -265,23 +264,126 @@ int wmain(const int argc, const wchar_t* argv[])
 	unsigned char* paBuf;
 	unsigned int bufSize;
 
-	//ReadBytes(L"06_Fixnum_16777216.rxdata");
-	//ReadBytes(L"06_Fixnum_16777217.rxdata");
-	//ReadBytes(L"07_Fixnum_-1.rxdata");
-	//ReadBytes(L"07_Fixnum_-123.rxdata");
-	//ReadBytes(L"07_Fixnum_-124.rxdata");
-	//ReadBytes(L"07_Fixnum_-256.rxdata");
-	//ReadBytes(L"07_Fixnum_-257.rxdata");
-	//ReadBytes(L"08_Fixnum_-65534.rxdata");
-	//ReadBytes(L"08_Fixnum_-65535.rxdata");
-	//ReadBytes(L"08_Fixnum_-65536.rxdata");
-	//ReadBytes(L"08_Fixnum_-65537.rxdata");
-	//ReadBytes(L"08_Fixnum_-16777215.rxdata");
-	//ReadBytes(L"08_Fixnum_-16777216.rxdata");
-	//ReadBytes(L"08_Fixnum_-16777217.rxdata");
-	//ReadBytes(L"08_Fixnum_-1073741824.rxdata");
-	//ReadBytes(L"08_Fixnum_-1073741825.rxdata");
-	//ReadBytes(L"marshals/String_abcd.rxdata");
+	gObjectPtrs.reserve(10000);
+
+	if (ReadBytes(L"marshals/06_Fixnum_16777216.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/06_Fixnum_16777217.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/07_Fixnum_-1.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/07_Fixnum_-123.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/07_Fixnum_-124.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/07_Fixnum_-256.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/07_Fixnum_-257.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-65534.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-65535.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-65536.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-65537.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-16777215.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-16777216.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	
+	if (ReadBytes(L"marshals/08_Fixnum_-16777217.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-1073741824.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/08_Fixnum_-1073741825.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/String_abcd.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
 	
 	if (ReadBytes(L"marshals/String_0123가나다라ABCD.rxdata", &paBuf, &bufSize))
 	{
@@ -290,6 +392,24 @@ int wmain(const int argc, const wchar_t* argv[])
 		paBuf = nullptr;
 	}
 
+	if (ReadBytes(L"marshals/String_empty.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/String_long063.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	for (auto* pObject : gObjectPtrs)
+	{
+		wprintf(L"%d(%c) -> %p\n", pObject->mType, pObject->mType, pObject->mpaPtr);
+	}
 
 	return 0;
 }
