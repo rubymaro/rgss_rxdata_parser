@@ -21,12 +21,18 @@
     <ClCompile Include="eRubyTokens.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="Object.cpp">
+    <ClCompile Include="RubyObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Object.h">
+    <ClInclude Include="RubyObject.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyString.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

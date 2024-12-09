@@ -4,9 +4,10 @@
 #include <vector>
 
 #include "eRubyTokens.h"
-#include "Object.h"
+#include "RubyObject.h"
+#include "RubyString.h"
 
-std::vector<Object*> gObjectPtrs;
+std::vector<RubyObject*> gObjectPtrs;
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool Parse(const unsigned char* const paBuf, const unsigned int bufSize);
@@ -228,27 +229,27 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 		{
 		case eRubyTokens::TYPE_NIL:
 			++pToken;
-			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_NIL, nullptr));
+			gObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_NIL, nullptr));
 			break;
 
 		case eRubyTokens::TYPE_TRUE:
 			++pToken;
-			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_TRUE, new bool(true)));
+			gObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_TRUE, new bool(true)));
 			break;
 
 		case eRubyTokens::TYPE_FALSE:
 			++pToken;
-			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_FALSE, new bool(false)));
+			gObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_FALSE, new bool(false)));
 			break;
 
 		case eRubyTokens::TYPE_FIXNUM:
 			ProcessFixnum(&pToken, &val);
-			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_FIXNUM, new int(val)));
+			gObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_FIXNUM, new int(val)));
 			break;
 
 		case eRubyTokens::TYPE_STRING:
 			ProcessStringUTF8(&pToken, &paString, &stringLength);
-			gObjectPtrs.push_back(new Object(eRubyTokens::TYPE_STRING, paString));
+			gObjectPtrs.push_back(new RubyString(eRubyTokens::TYPE_STRING, paString, stringLength));
 			break;
 
 		default:
@@ -408,7 +409,7 @@ int wmain(const int argc, const wchar_t* argv[])
 
 	for (auto* pObject : gObjectPtrs)
 	{
-		wprintf(L"%d(%c) -> %p\n", pObject->mType, pObject->mType, pObject->mpaPtr);
+		wprintf(L"%d(%c) -> %p\n", pObject->Type, pObject->Type, pObject->PAPtr);
 	}
 
 	return 0;
