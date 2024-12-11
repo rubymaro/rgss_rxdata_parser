@@ -6,6 +6,7 @@
 #include "eRubyTokens.h"
 #include "RubyObject.h"
 #include "RubyString.h"
+#include "RubyArray.h"
 
 std::vector<RubyObject*> gObjectPtrs;
 
@@ -288,7 +289,7 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 		case eRubyTokens::TYPE_ARRAY:
 			++pToken;
 			ProcessFixnum(&pToken, &val);
-			printf("array length = %d\n", val);
+			gObjectPtrs.push_back(new RubyArray(eRubyTokens::TYPE_ARRAY, new std::vector<void*>(val), val));
 			break;
 
 		default:

@@ -129,10 +129,12 @@
   <ItemGroup>
     <ClCompile Include="eRubyTokens.h" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="RubyArray.cpp" />
     <ClCompile Include="RubyObject.cpp" />
     <ClCompile Include="RubyString.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RubyArray.h" />
     <ClInclude Include="RubyObject.h" />
     <ClInclude Include="RubyString.h" />
   </ItemGroup>
