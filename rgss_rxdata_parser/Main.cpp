@@ -92,8 +92,6 @@ bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, uns
 
 bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
 {
-	++(*ppToken);
-
 	const int fixnumHeader = (*ppToken)[0];
 	int retFixnum = -1;
 
@@ -277,6 +275,7 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 			break;
 
 		case eRubyTokens::TYPE_FIXNUM:
+			++pToken;
 			ProcessFixnum(&pToken, &val);
 			gObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_FIXNUM, new int(val)));
 			break;
@@ -284,6 +283,12 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 		case eRubyTokens::TYPE_STRING:
 			ProcessStringUTF8(&pToken, &paString, &stringLength);
 			gObjectPtrs.push_back(new RubyString(eRubyTokens::TYPE_STRING, paString, stringLength));
+			break;
+
+		case eRubyTokens::TYPE_ARRAY:
+			++pToken;
+			ProcessFixnum(&pToken, &val);
+			printf("array length = %d\n", val);
 			break;
 
 		default:
@@ -468,6 +473,36 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
+
+	if (ReadBytes(L"marshals/marshal/array_empty.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nil1.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nil_122.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nil_123.rxdata", &paBuf, &bufSize))
+	{
+		Parse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+
 
 	for (const RubyObject* pObject : gObjectPtrs)
 	{
