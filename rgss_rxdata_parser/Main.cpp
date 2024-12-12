@@ -11,41 +11,222 @@
 std::vector<RubyObject*> gObjectPtrs;
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
-bool Parse(const unsigned char* const paBuf, const unsigned int bufSize);
+bool StartParse(const unsigned char* const paBuf, const unsigned int bufSize);
+bool ParseRecursive(const unsigned char* pToken, const unsigned char* const pEnd);
+const wchar_t* RubyTokenToString(const eRubyTokens token);
 
-const wchar_t* RubyTokenToString(const eRubyTokens token)
+int wmain(const int argc, const wchar_t* argv[])
 {
-	switch (token)
-	{
-	case eRubyTokens::TYPE_NIL: return L"TYPE_NIL";
-	case eRubyTokens::TYPE_TRUE: return L"TYPE_TRUE";
-	case eRubyTokens::TYPE_FALSE: return L"TYPE_FALSE";
-	case eRubyTokens::TYPE_FIXNUM: return L"TYPE_FIXNUM";
-	case eRubyTokens::TYPE_EXTENDED: return L"TYPE_EXTENDED";
-	case eRubyTokens::TYPE_UCLASS: return L"TYPE_UCLASS";
-	case eRubyTokens::TYPE_OBJECT: return L"TYPE_OBJECT";
-	case eRubyTokens::TYPE_DATA: return L"TYPE_DATA";
-	case eRubyTokens::TYPE_USERDEF: return L"TYPE_USERDEF";
-	case eRubyTokens::TYPE_USRMARSHAL: return L"TYPE_USRMARSHAL";
-	case eRubyTokens::TYPE_FLOAT: return L"TYPE_FLOAT";
-	case eRubyTokens::TYPE_BIGNUM: return L"TYPE_BIGNUM";
-	case eRubyTokens::TYPE_STRING: return L"TYPE_STRING";
-	case eRubyTokens::TYPE_REGEXP: return L"TYPE_REGEXP";
-	case eRubyTokens::TYPE_ARRAY: return L"TYPE_ARRAY";
-	case eRubyTokens::TYPE_HASH: return L"TYPE_HASH";
-	case eRubyTokens::TYPE_HASH_DEF: return L"TYPE_HASH_DEF";
-	case eRubyTokens::TYPE_STRUCT: return L"TYPE_STRUCT";
-	case eRubyTokens::TYPE_MODULE_OLD: return L"TYPE_MODULE_OLD";
-	case eRubyTokens::TYPE_CLASS: return L"TYPE_CLASS";
-	case eRubyTokens::TYPE_MODULE: return L"TYPE_MODULE";
-	case eRubyTokens::TYPE_SYMBOL: return L"TYPE_SYMBOL";
-	case eRubyTokens::TYPE_SYMLINK: return L"TYPE_SYMLINK";
-	case eRubyTokens::TYPE_IVAR: return L"TYPE_IVAR";
-	case eRubyTokens::TYPE_LINK: return L"TYPE_LINK";
-	default: return L"UNKNOWN_TOKEN";
-	}
-}
+	unsigned char* paBuf;
+	unsigned int bufSize;
 
+	gObjectPtrs.reserve(10000);
+
+	if (ReadBytes(L"marshals/marshal/nil.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/true.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/false.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/0x12345678.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/06_Fixnum_16777216.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/06_Fixnum_16777217.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/07_Fixnum_-1.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/07_Fixnum_-123.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/07_Fixnum_-124.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/07_Fixnum_-256.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/07_Fixnum_-257.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65534.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65535.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65536.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65537.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777215.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777216.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777217.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-1073741824.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/08_Fixnum_-1073741825.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/String_abcd.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/String_0123가나다라ABCD.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/String_empty.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/String_long063.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_empty.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nil1.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nil_122.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nil_123.rxdata", &paBuf, &bufSize))
+	{
+		StartParse(paBuf, bufSize);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+
+
+	for (const RubyObject* pObject : gObjectPtrs)
+	{
+		wprintf(L"%s(%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
+	}
+
+	return 0;
+}
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize)
 {
@@ -89,6 +270,30 @@ bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, uns
 	}
 
 	return bSuccess;
+}
+
+bool StartParse(const unsigned char* const paBuf, const unsigned int bufSize)
+{
+	assert(paBuf != nullptr);
+	assert(bufSize > 0);
+
+	const unsigned char* pToken = paBuf;
+	const unsigned char* const pEnd = paBuf + bufSize;
+
+	pToken = paBuf;
+	if (*pToken != MARSHAL_MAJOR)
+	{
+		return false;
+	}
+	++pToken;
+
+	if (*pToken != MARSHAL_MINOR)
+	{
+		return false;
+	}
+	++pToken;
+
+	return ParseRecursive(pToken, pEnd);
 }
 
 bool ProcessFixnum(const unsigned char** ppToken, int* outVal)
@@ -231,27 +436,8 @@ bool ProcessStringUTF8(const unsigned char** ppToken, char** ppaString, size_t* 
 	return true;
 }
 
-bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
+bool ParseRecursive(const unsigned char* pToken, const unsigned char* const pEnd)
 {
-	assert(paBuf != nullptr);
-	assert(bufSize > 0);
-
-	const unsigned char* pToken = paBuf;
-	const unsigned char* const pEnd = paBuf + bufSize;
-
-	pToken = paBuf;
-	if (*pToken != MARSHAL_MAJOR)
-	{
-		return false;
-	}
-	++pToken;
-
-	if (*pToken != MARSHAL_MINOR)
-	{
-		return false;
-	}
-	++pToken;
-
 	int val;
 	char* paString = nullptr;
 	size_t stringLength = 0;
@@ -300,215 +486,35 @@ bool Parse(const unsigned char* const paBuf, const unsigned int bufSize)
 	return true;
 }
 
-int wmain(const int argc, const wchar_t* argv[])
+const wchar_t* RubyTokenToString(const eRubyTokens token)
 {
-	unsigned char* paBuf;
-	unsigned int bufSize;
-
-	gObjectPtrs.reserve(10000);
-
-	if (ReadBytes(L"marshals/marshal/nil.rxdata", &paBuf, &bufSize))
+	switch (token)
 	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
+	case eRubyTokens::TYPE_NIL: return L"TYPE_NIL";
+	case eRubyTokens::TYPE_TRUE: return L"TYPE_TRUE";
+	case eRubyTokens::TYPE_FALSE: return L"TYPE_FALSE";
+	case eRubyTokens::TYPE_FIXNUM: return L"TYPE_FIXNUM";
+	case eRubyTokens::TYPE_EXTENDED: return L"TYPE_EXTENDED";
+	case eRubyTokens::TYPE_UCLASS: return L"TYPE_UCLASS";
+	case eRubyTokens::TYPE_OBJECT: return L"TYPE_OBJECT";
+	case eRubyTokens::TYPE_DATA: return L"TYPE_DATA";
+	case eRubyTokens::TYPE_USERDEF: return L"TYPE_USERDEF";
+	case eRubyTokens::TYPE_USRMARSHAL: return L"TYPE_USRMARSHAL";
+	case eRubyTokens::TYPE_FLOAT: return L"TYPE_FLOAT";
+	case eRubyTokens::TYPE_BIGNUM: return L"TYPE_BIGNUM";
+	case eRubyTokens::TYPE_STRING: return L"TYPE_STRING";
+	case eRubyTokens::TYPE_REGEXP: return L"TYPE_REGEXP";
+	case eRubyTokens::TYPE_ARRAY: return L"TYPE_ARRAY";
+	case eRubyTokens::TYPE_HASH: return L"TYPE_HASH";
+	case eRubyTokens::TYPE_HASH_DEF: return L"TYPE_HASH_DEF";
+	case eRubyTokens::TYPE_STRUCT: return L"TYPE_STRUCT";
+	case eRubyTokens::TYPE_MODULE_OLD: return L"TYPE_MODULE_OLD";
+	case eRubyTokens::TYPE_CLASS: return L"TYPE_CLASS";
+	case eRubyTokens::TYPE_MODULE: return L"TYPE_MODULE";
+	case eRubyTokens::TYPE_SYMBOL: return L"TYPE_SYMBOL";
+	case eRubyTokens::TYPE_SYMLINK: return L"TYPE_SYMLINK";
+	case eRubyTokens::TYPE_IVAR: return L"TYPE_IVAR";
+	case eRubyTokens::TYPE_LINK: return L"TYPE_LINK";
+	default: return L"UNKNOWN_TOKEN";
 	}
-
-	if (ReadBytes(L"marshals/marshal/true.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/false.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/0x12345678.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/06_Fixnum_16777216.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/06_Fixnum_16777217.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-1.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-123.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-124.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-256.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-257.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65534.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65535.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65536.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65537.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777215.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777216.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777217.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-1073741824.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-1073741825.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_abcd.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	
-	if (ReadBytes(L"marshals/marshal/String_0123가나다라ABCD.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_empty.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_long063.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_empty.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nil1.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nil_122.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nil_123.rxdata", &paBuf, &bufSize))
-	{
-		Parse(paBuf, bufSize);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-
-
-	for (const RubyObject* pObject : gObjectPtrs)
-	{
-		wprintf(L"%s(%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
-	}
-
-	return 0;
 }
