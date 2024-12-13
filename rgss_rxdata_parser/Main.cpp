@@ -23,6 +23,7 @@ int wmain(const int argc, const wchar_t* argv[])
 
 	rootObjectPtrs.reserve(10000);
 
+	/*
 	if (ReadBytes(L"marshals/marshal/nil.rxdata", &paBuf, &bufSize))
 	{
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -198,13 +199,6 @@ int wmain(const int argc, const wchar_t* argv[])
 		paBuf = nullptr;
 	}
 
-	if (ReadBytes(L"marshals/marshal/array_nil1.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
 	if (ReadBytes(L"marshals/marshal/array_nil_122.rxdata", &paBuf, &bufSize))
 	{
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -214,6 +208,15 @@ int wmain(const int argc, const wchar_t* argv[])
 
 	if (ReadBytes(L"marshals/marshal/array_nil_123.rxdata", &paBuf, &bufSize))
 	{
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/array_2d.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
 		delete[] paBuf;
 		paBuf = nullptr;
@@ -440,7 +443,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	int val;
 	char* paString = nullptr;
 	size_t stringLength = 0;
-	std::vector<RubyObject*>* paChildObjectPtrs;
+	std::vector<RubyObject*>* paChildObjectPtrs = nullptr;
 
 	while (*ppToken < pEnd)
 	{
