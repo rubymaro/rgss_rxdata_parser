@@ -700,7 +700,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			(*ppToken) += val;
 			break;
 
-		case eRubyTokens::TYPE_CLASS: // Struct
+		case eRubyTokens::TYPE_CLASS: // Struct, Class
 			++(*ppToken);
 			
 			ProcessFixnum(ppToken, &val);
