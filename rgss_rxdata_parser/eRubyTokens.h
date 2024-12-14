@@ -19,7 +19,7 @@ enum class eRubyTokens
 	TYPE_DATA = 'd',
 	TYPE_USERDEF = 'u',
 	TYPE_USRMARSHAL = 'U',
-	TYPE_FLOAT = 'f',
+	TYPE_FLOAT = 'f', // length, bytes
 	TYPE_BIGNUM = 'l', // sign, length, bytes[length]
 	TYPE_BIGNUM_PLUS_SIGN = '+',
 	TYPE_BIGNUM_MINUS_SIGN = '-',
@@ -30,7 +30,7 @@ enum class eRubyTokens
 	TYPE_HASH_DEF = '}', // std::vector<RubyObject*>
 	TYPE_STRUCT = 'S',
 	TYPE_MODULE_OLD = 'M',
-	TYPE_CLASS = 'c',
+	TYPE_CLASS = 'c', // Struct.new
 	TYPE_MODULE = 'm',
 
 	TYPE_SYMBOL = ':',
