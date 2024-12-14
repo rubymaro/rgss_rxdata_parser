@@ -4,7 +4,7 @@
 
 struct RubyString : public RubyObject
 {
-	RubyString(const eRubyTokens token, const char* paPtr, const size_t size);
+	RubyString(const char* paPtr, const size_t size);
 	
 	size_t Size;
 };

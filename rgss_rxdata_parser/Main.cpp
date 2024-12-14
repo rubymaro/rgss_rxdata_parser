@@ -7,6 +7,7 @@
 #include "RubyObject.h"
 #include "RubyString.h"
 #include "RubyArray.h"
+#include "RubyHash.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyObject*>& currentObjectPtrs);
@@ -212,9 +213,17 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/array_2d.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/hash_new.rxdata", &paBuf, &bufSize))
 	{
 		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -472,15 +481,28 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 		case eRubyTokens::TYPE_STRING:
 			ProcessStringUTF8(ppToken, &paString, &stringLength);
-			currentObjectPtrs.push_back(new RubyString(eRubyTokens::TYPE_STRING, paString, stringLength));
+			currentObjectPtrs.push_back(new RubyString(paString, stringLength));
 			break;
 
 		case eRubyTokens::TYPE_ARRAY:
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
 			paChildObjectPtrs = new std::vector<RubyObject*>(val);
-			currentObjectPtrs.push_back(new RubyArray(eRubyTokens::TYPE_ARRAY, paChildObjectPtrs, val));
+			currentObjectPtrs.push_back(new RubyArray(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+			break;
+
+		case eRubyTokens::TYPE_HASH:
+			++(*ppToken);
+			ProcessFixnum(ppToken, &val);
+			paChildObjectPtrs = new std::vector<RubyObject*>(val);
+			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
+			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+			break;
+
+		case eRubyTokens::TYPE_HASH_DEF:
+			++(*ppToken);
+			ProcessFixnum(ppToken, &val);
 			break;
 
 		default:

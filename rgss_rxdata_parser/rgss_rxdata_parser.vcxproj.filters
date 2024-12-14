@@ -30,6 +30,9 @@
     <ClCompile Include="RubyArray.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RubyHash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubyObject.h">
@@ -39,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RubyArray.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyHash.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
