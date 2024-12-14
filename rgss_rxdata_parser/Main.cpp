@@ -245,9 +245,33 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
+	
+	if (ReadBytes(L"marshals/marshal/hash_simple3.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/hash_new_0.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/hash_new_32.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
 	*/
 
-	if (ReadBytes(L"marshals/marshal/hash_simple3.rxdata", &paBuf, &bufSize))
+	if (ReadBytes(L"marshals/marshal/hash_new_default_key_val.rxdata", &paBuf, &bufSize))
 	{
 		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -518,17 +542,15 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			break;
 
 		case eRubyTokens::TYPE_HASH:
+			__fallthrough;
+		case eRubyTokens::TYPE_HASH_DEF:
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
+			val = val * 2 + 1; // <key, value> + default value
 			paChildObjectPtrs = new std::vector<RubyObject*>();
 			((std::vector<RubyObject*>*)paChildObjectPtrs)->reserve(val);
 			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
-			break;
-
-		case eRubyTokens::TYPE_HASH_DEF:
-			++(*ppToken);
-			ProcessFixnum(ppToken, &val);
 			break;
 
 		default:
