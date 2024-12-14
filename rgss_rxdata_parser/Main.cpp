@@ -221,7 +221,6 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/hash_new.rxdata", &paBuf, &bufSize))
 	{
@@ -231,9 +230,34 @@ int wmain(const int argc, const wchar_t* argv[])
 		paBuf = nullptr;
 	}
 
+	if (ReadBytes(L"marshals/marshal/hash_simple.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/hash_simple2.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/hash_simple3.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
 	for (const RubyObject* pObject : rootObjectPtrs)
 	{
-		wprintf(L"%s(%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
+		wprintf(L"%s (%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
 	}
 
 	return 0;
@@ -487,7 +511,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		case eRubyTokens::TYPE_ARRAY:
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
-			paChildObjectPtrs = new std::vector<RubyObject*>(val);
+			paChildObjectPtrs = new std::vector<RubyObject*>();
+			((std::vector<RubyObject*>*)paChildObjectPtrs)->reserve(val);
 			currentObjectPtrs.push_back(new RubyArray(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 			break;
@@ -495,7 +520,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		case eRubyTokens::TYPE_HASH:
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
-			paChildObjectPtrs = new std::vector<RubyObject*>(val);
+			paChildObjectPtrs = new std::vector<RubyObject*>();
+			((std::vector<RubyObject*>*)paChildObjectPtrs)->reserve(val);
 			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 			break;
