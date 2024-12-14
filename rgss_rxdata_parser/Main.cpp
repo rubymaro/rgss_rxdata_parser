@@ -8,6 +8,7 @@
 #include "RubyString.h"
 #include "RubyArray.h"
 #include "RubyHash.h"
+#include "RubyBignum.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyObject*>& currentObjectPtrs);
@@ -269,7 +270,6 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/hash_new_default_key_val.rxdata", &paBuf, &bufSize))
 	{
@@ -278,7 +278,65 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
+	*/
 
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_30.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_31.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_32.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_33.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_34.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_99.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_100.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	if (ReadBytes(L"marshals/marshal/bignum_2_exp_200.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
 	for (const RubyObject* pObject : rootObjectPtrs)
 	{
 		wprintf(L"%s (%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
@@ -501,6 +559,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	char* paString = nullptr;
 	size_t stringLength = 0;
 	std::vector<RubyObject*>* paChildObjectPtrs = nullptr;
+	bool bSignBignum;
+	char* paBuffer;
 
 	while (*ppToken < pEnd)
 	{
@@ -551,6 +611,25 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			((std::vector<RubyObject*>*)paChildObjectPtrs)->reserve(val);
 			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+			break;
+
+		case eRubyTokens::TYPE_BIGNUM:
+			++(*ppToken);
+
+			assert((**ppToken) == (char)eRubyTokens::TYPE_BIGNUM_PLUS_SIGN
+				|| (**ppToken) == (char)eRubyTokens::TYPE_BIGNUM_MINUS_SIGN);
+			bSignBignum = ((**ppToken) == (char)eRubyTokens::TYPE_BIGNUM_MINUS_SIGN);
+			++(*ppToken);
+
+			ProcessFixnum(ppToken, &val);
+			val *= 2;
+			
+			paBuffer = new char[val];
+			memcpy(paBuffer, *ppToken, val);
+			currentObjectPtrs.push_back(new RubyBignum(bSignBignum, val, paBuffer));
+
+			(*ppToken) += val;
+
 			break;
 
 		default:

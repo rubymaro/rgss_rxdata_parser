@@ -21,6 +21,8 @@ enum class eRubyTokens
 	TYPE_USRMARSHAL = 'U',
 	TYPE_FLOAT = 'f',
 	TYPE_BIGNUM = 'l',
+	TYPE_BIGNUM_PLUS_SIGN = '+',
+	TYPE_BIGNUM_MINUS_SIGN = '-',
 	TYPE_STRING = '"', // RubyString (UTF-8) excluding null character
 	TYPE_REGEXP = '/',
 	TYPE_ARRAY = '[', // std::vector<RubyObject*>
