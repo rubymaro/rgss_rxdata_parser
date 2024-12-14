@@ -9,6 +9,7 @@
 #include "RubyArray.h"
 #include "RubyHash.h"
 #include "RubyBignum.h"
+#include "RubyFloat.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyObject*>& currentObjectPtrs);
@@ -278,7 +279,6 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/bignum_2_exp_30.rxdata", &paBuf, &bufSize))
 	{
@@ -337,6 +337,56 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/float_0.999999999999.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/float_1.0.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/float_3.141592.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/float_inf.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/float_-inf.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/float_nan.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
 	for (const RubyObject* pObject : rootObjectPtrs)
 	{
 		wprintf(L"%s (%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
@@ -499,9 +549,6 @@ bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLe
 	assert(ppaString != nullptr);
 	assert(pOutLength != nullptr);
 
-	// skip the string header
-	++(*ppToken);
-
 	const int stringLengthHeader = (*ppToken)[0];
 	size_t utf8ByteLength = 0;
 
@@ -588,6 +635,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			break;
 
 		case eRubyTokens::TYPE_STRING:
+			++(*ppToken);
 			ProcessStringUTF8(ppToken, &paString, &stringLength);
 			currentObjectPtrs.push_back(new RubyString(paString, stringLength));
 			break;
@@ -629,7 +677,18 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			currentObjectPtrs.push_back(new RubyBignum(bSignBignum, val, paBuffer));
 
 			(*ppToken) += val;
+			break;
 
+		case eRubyTokens::TYPE_FLOAT:
+			++(*ppToken);
+
+			ProcessFixnum(ppToken, &val);
+
+			paBuffer = new char[val];
+			memcpy(paBuffer, *ppToken, val);
+			currentObjectPtrs.push_back(new RubyFloat(paBuffer, val));
+
+			(*ppToken) += val;
 			break;
 
 		default:

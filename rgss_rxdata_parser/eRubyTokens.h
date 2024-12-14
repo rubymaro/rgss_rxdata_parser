@@ -20,7 +20,7 @@ enum class eRubyTokens
 	TYPE_USERDEF = 'u',
 	TYPE_USRMARSHAL = 'U',
 	TYPE_FLOAT = 'f',
-	TYPE_BIGNUM = 'l',
+	TYPE_BIGNUM = 'l', // sign, length, bytes[length]
 	TYPE_BIGNUM_PLUS_SIGN = '+',
 	TYPE_BIGNUM_MINUS_SIGN = '-',
 	TYPE_STRING = '"', // RubyString (UTF-8) excluding null character

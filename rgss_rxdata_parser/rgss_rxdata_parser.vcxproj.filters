@@ -36,6 +36,9 @@
     <ClCompile Include="RubyBignum.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RubyFloat.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubyObject.h">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RubyBignum.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyFloat.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
