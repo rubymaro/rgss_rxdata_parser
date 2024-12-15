@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RubyObject.h"
+#include "RubyBase.h"
 
-struct RubyString : public RubyObject
+struct RubyString : public RubyBase
 {
 	RubyString(char* const paPtr, const size_t size);
 	

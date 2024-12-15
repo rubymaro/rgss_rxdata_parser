@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RubyObject.h"
+#include "RubyBase.h"
 
-struct RubyFloat : public RubyObject
+struct RubyFloat : public RubyBase
 {
 	static const char STATE_NAN[];
 	static const char STATE_INF[];

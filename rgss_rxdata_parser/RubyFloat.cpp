@@ -7,7 +7,7 @@ const char RubyFloat::STATE_INF[]        = { 'i', 'n', 'f' };
 const char RubyFloat::STATE_SIGNED_INF[] = { '-', 'i', 'n', 'f' };
 
 RubyFloat::RubyFloat(char* const paBytes, const size_t byteCount)
-	: RubyObject(eRubyTokens::TYPE_FLOAT, paBytes)
+	: RubyBase(eRubyTokens::TYPE_FLOAT, paBytes)
 	, ByteCount(byteCount)
 {
 	if (byteCount == sizeof(STATE_NAN) && memcmp(paBytes, STATE_NAN, sizeof(STATE_NAN)) == 0)

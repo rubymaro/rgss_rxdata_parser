@@ -2,11 +2,11 @@
 
 #include <vector>
 
-#include "RubyObject.h"
+#include "RubyBase.h"
 
-struct RubyHash : public RubyObject
+struct RubyHash : public RubyBase
 {
-	RubyHash(std::vector<RubyObject*>* const paPtrs, const size_t pairCount);
+	RubyHash(std::vector<RubyBase*>* const paPtrs, const size_t pairCount);
 
 	size_t PairCount;
 };

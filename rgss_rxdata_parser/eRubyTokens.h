@@ -25,9 +25,9 @@ enum class eRubyTokens
 	TYPE_BIGNUM_MINUS_SIGN = '-',
 	TYPE_STRING = '"', // RubyString (UTF-8) excluding null character
 	TYPE_REGEXP = '/',
-	TYPE_ARRAY = '[', // std::vector<RubyObject*>
-	TYPE_HASH = '{', // std::vector<RubyObject*>
-	TYPE_HASH_DEF = '}', // std::vector<RubyObject*>
+	TYPE_ARRAY = '[', // std::vector<RubyBase*>
+	TYPE_HASH = '{', // std::vector<RubyBase*>
+	TYPE_HASH_DEF = '}', // std::vector<RubyBase*>
 	TYPE_STRUCT = 'S',
 	TYPE_MODULE_OLD = 'M',
 	TYPE_CLASS = 'c', // Struct.new

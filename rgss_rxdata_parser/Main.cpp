@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "eRubyTokens.h"
-#include "RubyObject.h"
+#include "RubyBase.h"
 #include "RubyString.h"
 #include "RubyArray.h"
 #include "RubyHash.h"
@@ -13,8 +13,8 @@
 #include "RubyClass.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
-bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyObject*>& currentObjectPtrs);
-bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyObject*>& currentObjectPtrs);
+bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
+bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ProcessFixnum(unsigned char** ppToken, int* outVal);
 bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLength);
 const wchar_t* RubyTokenToString(const eRubyTokens token);
@@ -23,7 +23,7 @@ int wmain(const int argc, const wchar_t* argv[])
 {
 	unsigned char* paBuf;
 	unsigned int bufSize;
-	std::vector<RubyObject*> rootObjectPtrs;
+	std::vector<RubyBase*> rootObjectPtrs;
 
 	rootObjectPtrs.reserve(10000);
 
@@ -396,7 +396,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		paBuf = nullptr;
 	}
 
-	for (const RubyObject* pObject : rootObjectPtrs)
+	for (const RubyBase* pObject : rootObjectPtrs)
 	{
 		wprintf(L"%s (%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
 	}
@@ -448,7 +448,7 @@ bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, uns
 	return bSuccess;
 }
 
-bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyObject*>& currentObjectPtrs)
+bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs)
 {
 	assert(paBuf != nullptr);
 	assert(bufSize > 0);
@@ -609,12 +609,12 @@ bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLe
 	return true;
 }
 
-bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyObject*>& currentObjectPtrs)
+bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs)
 {
 	int val;
 	char* paString = nullptr;
 	size_t stringLength = 0;
-	std::vector<RubyObject*>* paChildObjectPtrs = nullptr;
+	std::vector<RubyBase*>* paChildObjectPtrs = nullptr;
 	bool bSignBignum;
 	char* paBuffer;
 
@@ -624,23 +624,23 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		{
 		case eRubyTokens::TYPE_NIL:
 			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_NIL, nullptr));
+			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_NIL, nullptr));
 			break;
 
 		case eRubyTokens::TYPE_TRUE:
 			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_TRUE, new bool(true)));
+			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_TRUE, new bool(true)));
 			break;
 
 		case eRubyTokens::TYPE_FALSE:
 			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_FALSE, new bool(false)));
+			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_FALSE, new bool(false)));
 			break;
 
 		case eRubyTokens::TYPE_FIXNUM:
 			++(*ppToken); 
 			ProcessFixnum(ppToken, &val);
-			currentObjectPtrs.push_back(new RubyObject(eRubyTokens::TYPE_FIXNUM, new int(val)));
+			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_FIXNUM, new int(val)));
 			break;
 
 		case eRubyTokens::TYPE_STRING:
@@ -652,8 +652,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		case eRubyTokens::TYPE_ARRAY:
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
-			paChildObjectPtrs = new std::vector<RubyObject*>();
-			((std::vector<RubyObject*>*)paChildObjectPtrs)->reserve(val);
+			paChildObjectPtrs = new std::vector<RubyBase*>();
+			((std::vector<RubyBase*>*)paChildObjectPtrs)->reserve(val);
 			currentObjectPtrs.push_back(new RubyArray(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 			break;
@@ -664,8 +664,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
 			val = val * 2 + 1; // <key, value> + default value
-			paChildObjectPtrs = new std::vector<RubyObject*>();
-			((std::vector<RubyObject*>*)paChildObjectPtrs)->reserve(val);
+			paChildObjectPtrs = new std::vector<RubyBase*>();
+			((std::vector<RubyBase*>*)paChildObjectPtrs)->reserve(val);
 			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 			break;

@@ -1,7 +1,7 @@
 #include "RubyArray.h"
 
-RubyArray::RubyArray(std::vector<RubyObject*>* const paPtrs, const size_t length)
-	: RubyObject(eRubyTokens::TYPE_ARRAY, paPtrs)
+RubyArray::RubyArray(std::vector<RubyBase*>* const paPtrs, const size_t length)
+	: RubyBase(eRubyTokens::TYPE_ARRAY, paPtrs)
 	, Length(length)
 {
 }

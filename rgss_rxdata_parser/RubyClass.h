@@ -1,8 +1,8 @@
 #pragma once
 
-#include "RubyObject.h"
+#include "RubyBase.h"
 
-struct RubyClass : public RubyObject
+struct RubyClass : public RubyBase
 {
 	RubyClass(char* const paClassName, const size_t classNameLength);
 

@@ -21,7 +21,7 @@
     <ClCompile Include="eRubyTokens.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="RubyObject.cpp">
+    <ClCompile Include="RubyBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RubyString.cpp">
@@ -44,7 +44,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RubyObject.h">
+    <ClInclude Include="RubyBase.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RubyString.h">

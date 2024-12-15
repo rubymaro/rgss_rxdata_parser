@@ -2,9 +2,9 @@
 
 #include "eRubyTokens.h"
 
-struct RubyObject
+struct RubyBase
 {
-	RubyObject(const eRubyTokens type, void* paPtr);
+	RubyBase(const eRubyTokens type, void* paPtr);
 
 	eRubyTokens Type;
 	void* PAPtr;

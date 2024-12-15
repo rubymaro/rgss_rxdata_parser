@@ -2,11 +2,11 @@
 
 #include <vector>
 
-#include "RubyObject.h"
+#include "RubyBase.h"
 
-struct RubyArray : public RubyObject
+struct RubyArray : public RubyBase
 {
-	RubyArray(std::vector<RubyObject*>* const paPtrs, const size_t length);
+	RubyArray(std::vector<RubyBase*>* const paPtrs, const size_t length);
 
 	size_t Length;
 };
