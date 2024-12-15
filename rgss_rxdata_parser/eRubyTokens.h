@@ -28,7 +28,7 @@ enum class eRubyTokens
 	TYPE_ARRAY = '[', // std::vector<RubyBase*>
 	TYPE_HASH = '{', // std::vector<RubyBase*>
 	TYPE_HASH_DEF = '}', // std::vector<RubyBase*>
-	TYPE_STRUCT = 'S',
+	TYPE_STRUCT = 'S', // instance
 	TYPE_MODULE_OLD = 'M',
 	TYPE_CLASS = 'c', // Struct.new
 	TYPE_MODULE = 'm',

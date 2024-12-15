@@ -42,6 +42,12 @@
     <ClCompile Include="RubyClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RubySymbol.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyStruct.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubyBase.h">
@@ -63,6 +69,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RubyClass.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubySymbol.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyStruct.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

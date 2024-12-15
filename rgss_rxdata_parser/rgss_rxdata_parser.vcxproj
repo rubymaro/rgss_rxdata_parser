@@ -136,6 +136,8 @@
     <ClCompile Include="RubyHash.cpp" />
     <ClCompile Include="RubyBase.cpp" />
     <ClCompile Include="RubyString.cpp" />
+    <ClCompile Include="RubyStruct.cpp" />
+    <ClCompile Include="RubySymbol.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubyArray.h" />
@@ -145,6 +147,8 @@
     <ClInclude Include="RubyHash.h" />
     <ClInclude Include="RubyBase.h" />
     <ClInclude Include="RubyString.h" />
+    <ClInclude Include="RubyStruct.h" />
+    <ClInclude Include="RubySymbol.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,12 +11,15 @@
 #include "RubyBignum.h"
 #include "RubyFloat.h"
 #include "RubyClass.h"
+#include "RubySymbol.h"
+#include "RubyStruct.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
 bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ProcessFixnum(unsigned char** ppToken, int* outVal);
 bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLength);
+bool ProcessSymbol(unsigned char** ppToken, char** ppaSymbol, size_t* pOutLength);
 const wchar_t* RubyTokenToString(const eRubyTokens token);
 
 int wmain(const int argc, const wchar_t* argv[])
@@ -386,9 +389,25 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/struct_customer.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/struct_abc_chocolate.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/struct_customer_instance_dave.rxdata", &paBuf, &bufSize))
 	{
 		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -609,14 +628,70 @@ bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLe
 	return true;
 }
 
+bool ProcessSymbol(unsigned char** ppToken, char** ppaSymbol, size_t* pOutLength)
+{
+	assert(ppToken != nullptr);
+	assert(ppaSymbol != nullptr);
+	assert(pOutLength != nullptr);
+
+	const int symbolLengthHeader = (*ppToken)[0];
+	size_t symbolLength = 0;
+
+	switch (symbolLengthHeader)
+	{
+	case 0x00: // zero length
+		(*ppToken)++;
+		break;
+
+	case 0x01:
+		symbolLength = (*ppToken)[1];
+		(*ppToken) += 2;
+		break;
+
+	case 0x02:
+		symbolLength = (*ppToken)[1] | (*ppToken)[2] << 8;
+		(*ppToken) += 3;
+		break;
+
+	case 0x03:
+		symbolLength = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16;
+		(*ppToken) += 4;
+		break;
+
+	case 0x04:
+		symbolLength = (*ppToken)[1] | (*ppToken)[2] << 8 | (*ppToken)[3] << 16 | (*ppToken)[4] << 24;
+		(*ppToken) += 5;
+		break;
+
+	default:
+		if (symbolLengthHeader >= 0x05 && symbolLengthHeader <= 0xff)
+		{
+			symbolLength = symbolLengthHeader - 0x05;
+			(*ppToken) += 1;
+			break;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	*ppaSymbol = new char[symbolLength];
+	memcpy(*ppaSymbol, reinterpret_cast<const char*>(*ppToken), symbolLength);
+	*pOutLength = symbolLength;
+
+	(*ppToken) += symbolLength;
+
+	return true;
+}
+
 bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs)
 {
 	int val;
-	char* paString = nullptr;
-	size_t stringLength = 0;
 	std::vector<RubyBase*>* paChildObjectPtrs = nullptr;
 	bool bSignBignum;
 	char* paBuffer;
+	size_t bufferLength = 0;
 
 	while (*ppToken < pEnd)
 	{
@@ -645,8 +720,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 		case eRubyTokens::TYPE_STRING:
 			++(*ppToken);
-			ProcessStringUTF8(ppToken, &paString, &stringLength);
-			currentObjectPtrs.push_back(new RubyString(paString, stringLength));
+			ProcessStringUTF8(ppToken, &paBuffer, &bufferLength);
+			currentObjectPtrs.push_back(new RubyString(paBuffer, bufferLength));
 			break;
 
 		case eRubyTokens::TYPE_ARRAY:
@@ -709,6 +784,29 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			memcpy(paBuffer, *ppToken, val);
 			currentObjectPtrs.push_back(new RubyClass(paBuffer, val));
 			(*ppToken) += val;
+
+			break;
+
+		case eRubyTokens::TYPE_SYMBOL:
+			++(*ppToken);
+			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+			currentObjectPtrs.push_back(new RubySymbol(paBuffer, bufferLength));
+			break;
+
+		case eRubyTokens::TYPE_STRUCT:
+			++(*ppToken);
+
+			++(*ppToken);
+			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+
+			ProcessFixnum(ppToken, &val);
+			val *= 2;
+
+			paChildObjectPtrs = new std::vector<RubyBase*>();
+			paChildObjectPtrs->reserve(val);
+			currentObjectPtrs.push_back(new RubyStruct(paBuffer, bufferLength, paChildObjectPtrs, val));
+
+			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 
 			break;
 
