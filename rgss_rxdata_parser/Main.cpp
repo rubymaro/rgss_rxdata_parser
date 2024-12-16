@@ -17,6 +17,7 @@
 #include "RubyClass.h"
 #include "RubySymbol.h"
 #include "RubyStruct.h"
+#include "RubyObject.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
@@ -409,9 +410,17 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/struct_customer_instance_dave.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/class_abc_chocolate_instance.rxdata", &paBuf, &bufSize))
 	{
 		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -792,7 +801,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		(*ppToken) += val;
 		break;
 
-	case eRubyTokens::TYPE_CLASS: // Struct, Class
+	case eRubyTokens::TYPE_CLASS: // Struct, Class Declaration
 		++(*ppToken);
 			
 		ProcessFixnum(ppToken, &val);
@@ -828,7 +837,10 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		{
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 		}
+		break;
 
+	case eRubyTokens::TYPE_OBJECT:
+		++(*ppToken);
 		break;
 
 	default:
