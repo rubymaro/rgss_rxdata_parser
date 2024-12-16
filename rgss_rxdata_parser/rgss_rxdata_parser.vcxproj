@@ -132,6 +132,7 @@
     <ClCompile Include="RubyArray.cpp" />
     <ClCompile Include="RubyBignum.cpp" />
     <ClCompile Include="RubyClass.cpp" />
+    <ClCompile Include="RubyFixnum.cpp" />
     <ClCompile Include="RubyFloat.cpp" />
     <ClCompile Include="RubyHash.cpp" />
     <ClCompile Include="RubyBase.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="RubyArray.h" />
     <ClInclude Include="RubyBignum.h" />
     <ClInclude Include="RubyClass.h" />
+    <ClInclude Include="RubyFixnum.h" />
     <ClInclude Include="RubyFloat.h" />
     <ClInclude Include="RubyHash.h" />
     <ClInclude Include="RubyBase.h" />

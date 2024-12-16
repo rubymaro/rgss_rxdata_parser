@@ -5,6 +5,7 @@
 
 #include "eRubyTokens.h"
 #include "RubyBase.h"
+#include "RubyFixnum.h"
 #include "RubyString.h"
 #include "RubyArray.h"
 #include "RubyHash.h"
@@ -715,7 +716,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		case eRubyTokens::TYPE_FIXNUM:
 			++(*ppToken); 
 			ProcessFixnum(ppToken, &val);
-			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_FIXNUM, new int(val)));
+			currentObjectPtrs.push_back(new RubyFixnum(new int(val)));
 			break;
 
 		case eRubyTokens::TYPE_STRING:
