@@ -719,7 +719,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		case eRubyTokens::TYPE_FIXNUM:
 			++(*ppToken); 
 			ProcessFixnum(ppToken, &val);
-			currentObjectPtrs.push_back(new RubyFixnum(new int(val)));
+			currentObjectPtrs.push_back(new RubyFixnum(val));
 			break;
 
 		case eRubyTokens::TYPE_STRING:
@@ -732,7 +732,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
 			paChildObjectPtrs = new std::vector<RubyBase*>();
-			((std::vector<RubyBase*>*)paChildObjectPtrs)->reserve(val);
+			paChildObjectPtrs->reserve(val);
 			currentObjectPtrs.push_back(new RubyArray(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 			break;
@@ -744,7 +744,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			ProcessFixnum(ppToken, &val);
 			val = val * 2 + 1; // <key, value> + default value
 			paChildObjectPtrs = new std::vector<RubyBase*>();
-			((std::vector<RubyBase*>*)paChildObjectPtrs)->reserve(val);
+			paChildObjectPtrs->reserve(val);
 			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 			break;

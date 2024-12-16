@@ -4,6 +4,6 @@
 
 struct RubyFixnum : public RubyBase
 {
-	RubyFixnum(int* const paPtr);
+	RubyFixnum(const int val);
 };
 
