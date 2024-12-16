@@ -418,9 +418,25 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/class_abc_chocolate_instance.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/array_nested1.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+
+	if (ReadBytes(L"marshals/marshal/array_nested2.rxdata", &paBuf, &bufSize))
 	{
 		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
