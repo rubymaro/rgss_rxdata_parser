@@ -868,6 +868,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 	default:
 		wprintf(L"not registered token: %s\n", RubyTokenToString(static_cast<eRubyTokens>(**ppToken)));
+		assert(false);
 		return false;
 	}
 
