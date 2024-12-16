@@ -6,6 +6,8 @@
 #include "eRubyTokens.h"
 #include "RubyBase.h"
 #include "RubyNil.h"
+#include "RubyTrue.h"
+#include "RubyFalse.h"
 #include "RubyFixnum.h"
 #include "RubyString.h"
 #include "RubyArray.h"
@@ -706,12 +708,12 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 		case eRubyTokens::TYPE_TRUE:
 			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_TRUE, new bool(true)));
+			currentObjectPtrs.push_back(new RubyTrue());
 			break;
 
 		case eRubyTokens::TYPE_FALSE:
 			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_FALSE, new bool(false)));
+			currentObjectPtrs.push_back(new RubyFalse());
 			break;
 
 		case eRubyTokens::TYPE_FIXNUM:
