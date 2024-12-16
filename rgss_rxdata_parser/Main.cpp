@@ -432,7 +432,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		paChildObjectPtrs = new std::vector<RubyBase*>();
 		paChildObjectPtrs->reserve(val);
 		currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
-		for (repCount = 0; repCount < val; ++val)
+		for (repCount = 0; repCount < val; ++repCount)
 		{
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
 		}
