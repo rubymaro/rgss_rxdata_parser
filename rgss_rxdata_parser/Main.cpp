@@ -5,6 +5,7 @@
 
 #include "eRubyTokens.h"
 #include "RubyBase.h"
+#include "RubyNil.h"
 #include "RubyFixnum.h"
 #include "RubyString.h"
 #include "RubyArray.h"
@@ -700,7 +701,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		{
 		case eRubyTokens::TYPE_NIL:
 			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyBase(eRubyTokens::TYPE_NIL, nullptr));
+			currentObjectPtrs.push_back(new RubyNil());
 			break;
 
 		case eRubyTokens::TYPE_TRUE:
