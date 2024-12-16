@@ -841,6 +841,13 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 	case eRubyTokens::TYPE_OBJECT:
 		++(*ppToken);
+
+		assert(**ppToken == ':');
+		++(*ppToken);
+		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+
+		currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength));
+
 		break;
 
 	default:
