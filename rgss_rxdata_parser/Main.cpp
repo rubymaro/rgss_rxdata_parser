@@ -442,7 +442,6 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/array_two_same_symbols.rxdata", &paBuf, &bufSize))
 	{
@@ -451,7 +450,16 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
+	*/
 
+	if (ReadBytes(L"marshals/marshal/array_two_same_strings.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	
 	for (const RubyBase* pObject : rootObjectPtrs)
 	{
 		wprintf(L"%s (%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
@@ -878,6 +886,13 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 		currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength));
 
+		break;
+
+	case eRubyTokens::TYPE_LINK:
+		++(*ppToken);
+		ProcessFixnum(ppToken, &val);
+		val += 1;
+		currentObjectPtrs.push_back(RubyBase::sObjectReferences[val]);
 		break;
 
 	default:
