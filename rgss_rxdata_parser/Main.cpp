@@ -2,6 +2,7 @@
 #include <cassert>
 #include <strsafe.h>
 #include <vector>
+#include <Windows.h>
 
 #include "eRubyTokens.h"
 #include "RubyBase.h"
@@ -18,6 +19,7 @@
 #include "RubySymbol.h"
 #include "RubyStruct.h"
 #include "RubyObject.h"
+#include <clocale>
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
@@ -27,442 +29,75 @@ bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLe
 bool ProcessSymbol(unsigned char** ppToken, char** ppaSymbol, size_t* pOutLength);
 const wchar_t* RubyTokenToString(const eRubyTokens token);
 
+void PrintRxdataRecursive(const std::vector<RubyBase*>& root, const int indent);
+
 int wmain(const int argc, const wchar_t* argv[])
 {
 	unsigned char* paBuf;
 	unsigned int bufSize;
 	std::vector<RubyBase*> rootObjectPtrs;
+	const wchar_t* ppFileNames[] = {
+		L"marshals/marshal/nil.rxdata",
+		L"marshals/marshal/true.rxdata",
+		L"marshals/marshal/false.rxdata",
+		L"marshals/marshal/0x12345678.rxdata",
+		L"marshals/marshal/String_abcd.rxdata",
+		L"marshals/marshal/String_0123가나다라ABCD.rxdata",
+		L"marshals/marshal/String_empty.rxdata",
+		L"marshals/marshal/String_long063.rxdata",
+		L"marshals/marshal/array_empty.rxdata",
+		L"marshals/marshal/array_2d.rxdata",
+		L"marshals/marshal/hash_new.rxdata",
+		L"marshals/marshal/hash_simple.rxdata",
+		L"marshals/marshal/hash_simple2.rxdata",
+		L"marshals/marshal/hash_simple3.rxdata",
+		L"marshals/marshal/hash_new_0.rxdata",
+		L"marshals/marshal/hash_new_32.rxdata",
+		L"marshals/marshal/hash_new_default_key_val.rxdata",
+		L"marshals/marshal/bignum_2_exp_30.rxdata",
+		L"marshals/marshal/bignum_2_exp_31.rxdata",
+		L"marshals/marshal/bignum_2_exp_32.rxdata",
+		L"marshals/marshal/bignum_2_exp_33.rxdata",
+		L"marshals/marshal/bignum_2_exp_34.rxdata",
+		L"marshals/marshal/bignum_2_exp_99.rxdata",
+		L"marshals/marshal/bignum_2_exp_100.rxdata",
+		L"marshals/marshal/bignum_2_exp_200.rxdata",
+		L"marshals/marshal/float_0.999999999999.rxdata",
+		L"marshals/marshal/float_1.0.rxdata",
+		L"marshals/marshal/float_3.141592.rxdata",
+		L"marshals/marshal/float_inf.rxdata",
+		L"marshals/marshal/float_-inf.rxdata",
+		L"marshals/marshal/float_nan.rxdata",
+		L"marshals/marshal/struct_customer.rxdata",
+		L"marshals/marshal/struct_abc_chocolate.rxdata",
+		L"marshals/marshal/struct_customer_instance_dave.rxdata",
+		L"marshals/marshal/class_abc_chocolate_instance.rxdata",
+		L"marshals/marshal/array_nested1.rxdata",
+		L"marshals/marshal/array_nested2.rxdata",
+		L"marshals/marshal/array_two_same_symbols.rxdata",
+		L"marshals/marshal/array_two_same_strings.rxdata",
+		L"marshals/marshal/game_system_instance.rxdata",
+	};
 
 	rootObjectPtrs.reserve(10000);
+	_wsetlocale(LC_ALL, L"");
 
-	/*
-	if (ReadBytes(L"marshals/marshal/nil.rxdata", &paBuf, &bufSize))
+	for (const wchar_t* pFileName : ppFileNames)
 	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/true.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/false.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/0x12345678.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/06_Fixnum_16777216.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/06_Fixnum_16777217.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-1.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-123.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-124.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-256.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/07_Fixnum_-257.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65534.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65535.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65536.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-65537.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777215.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777216.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-16777217.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-1073741824.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/08_Fixnum_-1073741825.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_abcd.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_0123가나다라ABCD.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_empty.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/String_long063.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_empty.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nil_122.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nil_123.rxdata", &paBuf, &bufSize))
-	{
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_2d.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/hash_new.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/hash_simple.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/hash_simple2.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	
-	if (ReadBytes(L"marshals/marshal/hash_simple3.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/hash_new_0.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/hash_new_32.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/hash_new_default_key_val.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_30.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_31.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_32.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_33.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_34.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_99.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_100.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	if (ReadBytes(L"marshals/marshal/bignum_2_exp_200.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/float_0.999999999999.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/float_1.0.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/float_3.141592.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/float_inf.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/float_-inf.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/float_nan.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/struct_customer.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/struct_abc_chocolate.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/struct_customer_instance_dave.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/class_abc_chocolate_instance.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nested1.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_nested2.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-
-	if (ReadBytes(L"marshals/marshal/array_two_same_symbols.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	*/
-
-	if (ReadBytes(L"marshals/marshal/array_two_same_strings.rxdata", &paBuf, &bufSize))
-	{
-		rootObjectPtrs.clear();
-		StartParse(paBuf, bufSize, rootObjectPtrs);
-		delete[] paBuf;
-		paBuf = nullptr;
-	}
-	
-	for (const RubyBase* pObject : rootObjectPtrs)
-	{
-		wprintf(L"%s (%c) -> %p\n", RubyTokenToString(pObject->Type), pObject->Type, pObject->PAPtr);
+		wprintf(L"Start reading \"%s\"\n", pFileName);
+		if (ReadBytes(pFileName, &paBuf, &bufSize))
+		{
+			rootObjectPtrs.clear();
+			StartParse(paBuf, bufSize, rootObjectPtrs);
+			delete[] paBuf;
+			paBuf = nullptr;
+			PrintRxdataRecursive(rootObjectPtrs, 0);
+		}
+		else
+		{
+			assert(false);
+		}
+		wprintf(L"----------------------------------\n\n");
 	}
 
 	return 0;
@@ -960,5 +595,95 @@ const wchar_t* RubyTokenToString(const eRubyTokens token)
 		return L"TYPE_LINK";
 	default:
 		return L"UNKNOWN_TOKEN";
+	}
+}
+
+void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int indent)
+{
+	for (const RubyBase* pObject : refObjects)
+	{
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		switch (pObject->Type)
+		{
+		case eRubyTokens::TYPE_NIL:
+			wprintf(L"nil\n");
+			break;
+		case eRubyTokens::TYPE_TRUE:
+			wprintf(L"true\n");
+			break;
+		case eRubyTokens::TYPE_FALSE:
+			wprintf(L"false\n");
+			break;
+		case eRubyTokens::TYPE_FIXNUM:
+			wprintf(L"0x%x\n", *static_cast<int*>(pObject->PAPtr));
+			break;
+		case eRubyTokens::TYPE_EXTENDED:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_UCLASS:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_OBJECT:
+			wprintf(L"Fixnum(%d)\n", *static_cast<int*>(pObject->PAPtr));
+			break;
+		case eRubyTokens::TYPE_DATA:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_USERDEF:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_USRMARSHAL:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_FLOAT:
+			break;
+		case eRubyTokens::TYPE_BIGNUM:
+			break;
+		case eRubyTokens::TYPE_STRING:
+			fwrite(reinterpret_cast<const RubyString*>(pObject)->PAPtr, sizeof(char), reinterpret_cast<const RubyString*>(pObject)->Size, stdout);
+			wprintf(L"\n");
+			break;
+		case eRubyTokens::TYPE_REGEXP:
+			break;
+		case eRubyTokens::TYPE_ARRAY:
+			wprintf(L"[\n");
+			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"]\n");
+			break;
+		case eRubyTokens::TYPE_HASH:
+			break;
+		case eRubyTokens::TYPE_HASH_DEF:
+			break;
+		case eRubyTokens::TYPE_STRUCT:
+			break;
+		case eRubyTokens::TYPE_MODULE_OLD:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_CLASS:
+			break;
+		case eRubyTokens::TYPE_MODULE:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_SYMBOL:
+			break;
+		case eRubyTokens::TYPE_SYMLINK:
+			break;
+		case eRubyTokens::TYPE_IVAR:
+			assert(0);
+			break;
+		case eRubyTokens::TYPE_LINK:
+			break;
+		default:
+			break;
+		}
+		
 	}
 }
