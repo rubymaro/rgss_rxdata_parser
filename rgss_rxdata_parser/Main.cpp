@@ -426,7 +426,6 @@ int wmain(const int argc, const wchar_t* argv[])
 		delete[] paBuf;
 		paBuf = nullptr;
 	}
-	*/
 
 	if (ReadBytes(L"marshals/marshal/array_nested1.rxdata", &paBuf, &bufSize))
 	{
@@ -437,6 +436,15 @@ int wmain(const int argc, const wchar_t* argv[])
 	}
 
 	if (ReadBytes(L"marshals/marshal/array_nested2.rxdata", &paBuf, &bufSize))
+	{
+		rootObjectPtrs.clear();
+		StartParse(paBuf, bufSize, rootObjectPtrs);
+		delete[] paBuf;
+		paBuf = nullptr;
+	}
+	*/
+
+	if (ReadBytes(L"marshals/marshal/array_two_same_symbols.rxdata", &paBuf, &bufSize))
 	{
 		rootObjectPtrs.clear();
 		StartParse(paBuf, bufSize, rootObjectPtrs);
@@ -833,6 +841,12 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		++(*ppToken);
 		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
 		currentObjectPtrs.push_back(new RubySymbol(paBuffer, bufferLength));
+		break;
+
+	case eRubyTokens::TYPE_SYMLINK:
+		++(*ppToken);
+		ProcessFixnum(ppToken, &val);
+		currentObjectPtrs.push_back(RubySymbol::sSymbolLinks[val]);
 		break;
 
 	case eRubyTokens::TYPE_STRUCT:

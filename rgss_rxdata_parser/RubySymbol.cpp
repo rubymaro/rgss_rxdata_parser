@@ -1,7 +1,10 @@
 #include "RubySymbol.h"
 
-RubySymbol::RubySymbol(char* const paPtr, const size_t size)
-	: RubyBase(eRubyTokens::TYPE_SYMBOL, paPtr)
-	, Size(size)
+std::vector<RubySymbol*> RubySymbol::sSymbolLinks;
+
+RubySymbol::RubySymbol(char* const paSymbolName, const size_t symbolNameLength)
+	: RubyBase(eRubyTokens::TYPE_SYMBOL, paSymbolName)
+	, SymbolNameLength(symbolNameLength)
 {
+	sSymbolLinks.push_back(this);
 }
