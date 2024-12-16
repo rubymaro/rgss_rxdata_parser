@@ -692,131 +692,148 @@ bool ProcessSymbol(unsigned char** ppToken, char** ppaSymbol, size_t* pOutLength
 bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs)
 {
 	int val;
-	std::vector<RubyBase*>* paChildObjectPtrs = nullptr;
-	bool bSignBignum;
+	int repCount;
 	char* paBuffer;
-	size_t bufferLength = 0;
+	size_t bufferLength;
+	bool bSignBignum;
+	std::vector<RubyBase*>* paChildObjectPtrs;
+	int hashDefault = 0;
 
-	while (*ppToken < pEnd)
+	assert(*ppToken <= pEnd);
+	if (*ppToken == pEnd)
 	{
-		switch ((eRubyTokens)(**ppToken))
+		return true;
+	}
+
+	switch (static_cast<eRubyTokens>(**ppToken))
+	{
+	case eRubyTokens::TYPE_NIL:
+		++(*ppToken);
+		currentObjectPtrs.push_back(new RubyNil());
+		break;
+
+	case eRubyTokens::TYPE_TRUE:
+		++(*ppToken);
+		currentObjectPtrs.push_back(new RubyTrue());
+		break;
+
+	case eRubyTokens::TYPE_FALSE:
+		++(*ppToken);
+		currentObjectPtrs.push_back(new RubyFalse());
+		break;
+
+	case eRubyTokens::TYPE_FIXNUM:
+		++(*ppToken); 
+		ProcessFixnum(ppToken, &val);
+		currentObjectPtrs.push_back(new RubyFixnum(val));
+		break;
+
+	case eRubyTokens::TYPE_STRING:
+		++(*ppToken);
+		ProcessStringUTF8(ppToken, &paBuffer, &bufferLength);
+		currentObjectPtrs.push_back(new RubyString(paBuffer, bufferLength));
+		break;
+
+	case eRubyTokens::TYPE_ARRAY:
+		++(*ppToken);
+		ProcessFixnum(ppToken, &val);
+		paChildObjectPtrs = new std::vector<RubyBase*>();
+		paChildObjectPtrs->reserve(val);
+		currentObjectPtrs.push_back(new RubyArray(paChildObjectPtrs, val));
+		for (repCount = 0; repCount < val; ++repCount)
 		{
-		case eRubyTokens::TYPE_NIL:
-			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyNil());
-			break;
-
-		case eRubyTokens::TYPE_TRUE:
-			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyTrue());
-			break;
-
-		case eRubyTokens::TYPE_FALSE:
-			++(*ppToken);
-			currentObjectPtrs.push_back(new RubyFalse());
-			break;
-
-		case eRubyTokens::TYPE_FIXNUM:
-			++(*ppToken); 
-			ProcessFixnum(ppToken, &val);
-			currentObjectPtrs.push_back(new RubyFixnum(val));
-			break;
-
-		case eRubyTokens::TYPE_STRING:
-			++(*ppToken);
-			ProcessStringUTF8(ppToken, &paBuffer, &bufferLength);
-			currentObjectPtrs.push_back(new RubyString(paBuffer, bufferLength));
-			break;
-
-		case eRubyTokens::TYPE_ARRAY:
-			++(*ppToken);
-			ProcessFixnum(ppToken, &val);
-			paChildObjectPtrs = new std::vector<RubyBase*>();
-			paChildObjectPtrs->reserve(val);
-			currentObjectPtrs.push_back(new RubyArray(paChildObjectPtrs, val));
 			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
-			break;
-
-		case eRubyTokens::TYPE_HASH:
-			__fallthrough;
-		case eRubyTokens::TYPE_HASH_DEF:
-			++(*ppToken);
-			ProcessFixnum(ppToken, &val);
-			val = val * 2 + 1; // <key, value> + default value
-			paChildObjectPtrs = new std::vector<RubyBase*>();
-			paChildObjectPtrs->reserve(val);
-			currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
-			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
-			break;
-
-		case eRubyTokens::TYPE_BIGNUM:
-			++(*ppToken);
-
-			assert((**ppToken) == (char)eRubyTokens::TYPE_BIGNUM_PLUS_SIGN
-				|| (**ppToken) == (char)eRubyTokens::TYPE_BIGNUM_MINUS_SIGN);
-			bSignBignum = ((**ppToken) == (char)eRubyTokens::TYPE_BIGNUM_MINUS_SIGN);
-			++(*ppToken);
-
-			ProcessFixnum(ppToken, &val);
-			val *= 2;
-			
-			paBuffer = new char[val];
-			memcpy(paBuffer, *ppToken, val);
-			currentObjectPtrs.push_back(new RubyBignum(bSignBignum, val, paBuffer));
-
-			(*ppToken) += val;
-			break;
-
-		case eRubyTokens::TYPE_FLOAT:
-			++(*ppToken);
-
-			ProcessFixnum(ppToken, &val);
-
-			paBuffer = new char[val];
-			memcpy(paBuffer, *ppToken, val);
-			currentObjectPtrs.push_back(new RubyFloat(paBuffer, val));
-
-			(*ppToken) += val;
-			break;
-
-		case eRubyTokens::TYPE_CLASS: // Struct, Class
-			++(*ppToken);
-			
-			ProcessFixnum(ppToken, &val);
-
-			paBuffer = new char[val];
-			memcpy(paBuffer, *ppToken, val);
-			currentObjectPtrs.push_back(new RubyClass(paBuffer, val));
-			(*ppToken) += val;
-
-			break;
-
-		case eRubyTokens::TYPE_SYMBOL:
-			++(*ppToken);
-			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
-			currentObjectPtrs.push_back(new RubySymbol(paBuffer, bufferLength));
-			break;
-
-		case eRubyTokens::TYPE_STRUCT:
-			++(*ppToken);
-
-			++(*ppToken);
-			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
-
-			ProcessFixnum(ppToken, &val);
-			val *= 2;
-
-			paChildObjectPtrs = new std::vector<RubyBase*>();
-			paChildObjectPtrs->reserve(val);
-			currentObjectPtrs.push_back(new RubyStruct(paBuffer, bufferLength, paChildObjectPtrs, val));
-
-			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
-
-			break;
-
-		default:
-			return false;
 		}
+		break;
+
+	case eRubyTokens::TYPE_HASH_DEF:
+		hashDefault = 1;
+		__fallthrough;
+	case eRubyTokens::TYPE_HASH:
+		++(*ppToken);
+		ProcessFixnum(ppToken, &val);
+		val = val * 2 + hashDefault; // <key, value> + default value
+		paChildObjectPtrs = new std::vector<RubyBase*>();
+		paChildObjectPtrs->reserve(val);
+		currentObjectPtrs.push_back(new RubyHash(paChildObjectPtrs, val));
+		for (repCount = 0; repCount < val; ++val)
+		{
+			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+		}
+		break;
+
+	case eRubyTokens::TYPE_BIGNUM:
+		++(*ppToken);
+
+		assert((**ppToken) == static_cast<char>(eRubyTokens::TYPE_BIGNUM_PLUS_SIGN)
+			|| (**ppToken) == static_cast<char>(eRubyTokens::TYPE_BIGNUM_MINUS_SIGN));
+		bSignBignum = ((**ppToken) == static_cast<char>(eRubyTokens::TYPE_BIGNUM_MINUS_SIGN));
+		++(*ppToken);
+
+		ProcessFixnum(ppToken, &val);
+		val *= 2;
+			
+		paBuffer = new char[val];
+		memcpy(paBuffer, *ppToken, val);
+		currentObjectPtrs.push_back(new RubyBignum(bSignBignum, val, paBuffer));
+
+		(*ppToken) += val;
+		break;
+
+	case eRubyTokens::TYPE_FLOAT:
+		++(*ppToken);
+
+		ProcessFixnum(ppToken, &val);
+
+		paBuffer = new char[val];
+		memcpy(paBuffer, *ppToken, val);
+		currentObjectPtrs.push_back(new RubyFloat(paBuffer, val));
+
+		(*ppToken) += val;
+		break;
+
+	case eRubyTokens::TYPE_CLASS: // Struct, Class
+		++(*ppToken);
+			
+		ProcessFixnum(ppToken, &val);
+
+		paBuffer = new char[val];
+		memcpy(paBuffer, *ppToken, val);
+		currentObjectPtrs.push_back(new RubyClass(paBuffer, val));
+		(*ppToken) += val;
+
+		break;
+
+	case eRubyTokens::TYPE_SYMBOL:
+		++(*ppToken);
+		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+		currentObjectPtrs.push_back(new RubySymbol(paBuffer, bufferLength));
+		break;
+
+	case eRubyTokens::TYPE_STRUCT:
+		++(*ppToken);
+
+		assert(**ppToken == ':');
+		++(*ppToken);
+		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+
+		ProcessFixnum(ppToken, &val);
+		val *= 2;
+
+		paChildObjectPtrs = new std::vector<RubyBase*>();
+		paChildObjectPtrs->reserve(val);
+		currentObjectPtrs.push_back(new RubyStruct(paBuffer, bufferLength, paChildObjectPtrs, val));
+
+		for (repCount = 0; repCount < val; ++repCount)
+		{
+			ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+		}
+
+		break;
+
+	default:
+		wprintf(L"not registered token: %s\n", RubyTokenToString(static_cast<eRubyTokens>(**ppToken)));
+		return false;
 	}
 
 	return true;
@@ -876,6 +893,7 @@ const wchar_t* RubyTokenToString(const eRubyTokens token)
 		return L"TYPE_IVAR";
 	case eRubyTokens::TYPE_LINK:
 		return L"TYPE_LINK";
-	default: return L"UNKNOWN_TOKEN";
+	default:
+		return L"UNKNOWN_TOKEN";
 	}
 }
