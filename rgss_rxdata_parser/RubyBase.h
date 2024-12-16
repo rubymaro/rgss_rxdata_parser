@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "eRubyTokens.h"
 
 struct RubyBase
@@ -8,4 +10,6 @@ struct RubyBase
 
 	eRubyTokens Type;
 	void* PAPtr;
+
+	static std::vector<RubyBase*> sObjectReferences;
 };

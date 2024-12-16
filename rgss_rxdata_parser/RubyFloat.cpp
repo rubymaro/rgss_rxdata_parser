@@ -26,4 +26,6 @@ RubyFloat::RubyFloat(char* const paBytes, const size_t byteCount)
 	{
 		State = eStates::Normal;
 	}
+
+	sObjectReferences.push_back(this);
 }

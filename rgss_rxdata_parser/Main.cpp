@@ -742,17 +742,17 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	{
 	case eRubyTokens::TYPE_NIL:
 		++(*ppToken);
-		currentObjectPtrs.push_back(new RubyNil());
+		currentObjectPtrs.push_back(new RubyNil);
 		break;
 
 	case eRubyTokens::TYPE_TRUE:
 		++(*ppToken);
-		currentObjectPtrs.push_back(new RubyTrue());
+		currentObjectPtrs.push_back(new RubyTrue);
 		break;
 
 	case eRubyTokens::TYPE_FALSE:
 		++(*ppToken);
-		currentObjectPtrs.push_back(new RubyFalse());
+		currentObjectPtrs.push_back(new RubyFalse);
 		break;
 
 	case eRubyTokens::TYPE_FIXNUM:

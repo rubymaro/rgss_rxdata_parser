@@ -5,4 +5,5 @@ RubyBignum::RubyBignum(bool bSign, const size_t byteLength, char* bytes)
 	, Sign(bSign)
 	, ByteLength(byteLength)
 {
+	sObjectReferences.push_back(this);
 }

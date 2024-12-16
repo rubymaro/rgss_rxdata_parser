@@ -5,4 +5,5 @@ RubyObject::RubyObject(char* const paClassName, const size_t classNameLength)
 	, PAClassName(paClassName)
 	, ClassNameLength(classNameLength)
 {
+	sObjectReferences.push_back(this);
 }

@@ -6,4 +6,5 @@ RubyStruct::RubyStruct(char* const paStructName, size_t structNameLength, std::v
 	, PAStructName(paStructName)
 	, StructNameLength(structNameLength)
 {
+	sObjectReferences.push_back(this);
 }
