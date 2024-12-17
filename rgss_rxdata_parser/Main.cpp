@@ -28,8 +28,7 @@ bool ProcessFixnum(unsigned char** ppToken, int* outVal);
 bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLength);
 bool ProcessSymbol(unsigned char** ppToken, char** ppaSymbol, size_t* pOutLength);
 const wchar_t* RubyTokenToString(const eRubyTokens token);
-
-void PrintRxdataRecursive(const std::vector<RubyBase*>& root, const int indent);
+void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent);
 
 int wmain(const int argc, const wchar_t* argv[])
 {
@@ -37,46 +36,47 @@ int wmain(const int argc, const wchar_t* argv[])
 	unsigned int bufSize;
 	std::vector<RubyBase*> rootObjectPtrs;
 	const wchar_t* ppFileNames[] = {
-		L"marshals/marshal/nil.rxdata",
-		L"marshals/marshal/true.rxdata",
-		L"marshals/marshal/false.rxdata",
-		L"marshals/marshal/0x12345678.rxdata",
-		L"marshals/marshal/String_abcd.rxdata",
-		L"marshals/marshal/String_0123가나다라ABCD.rxdata",
-		L"marshals/marshal/String_empty.rxdata",
-		L"marshals/marshal/String_long063.rxdata",
-		L"marshals/marshal/array_empty.rxdata",
-		L"marshals/marshal/array_2d.rxdata",
-		L"marshals/marshal/hash_new.rxdata",
-		L"marshals/marshal/hash_simple.rxdata",
-		L"marshals/marshal/hash_simple2.rxdata",
-		L"marshals/marshal/hash_simple3.rxdata",
-		L"marshals/marshal/hash_new_0.rxdata",
-		L"marshals/marshal/hash_new_32.rxdata",
-		L"marshals/marshal/hash_new_default_key_val.rxdata",
-		L"marshals/marshal/bignum_2_exp_30.rxdata",
-		L"marshals/marshal/bignum_2_exp_31.rxdata",
-		L"marshals/marshal/bignum_2_exp_32.rxdata",
-		L"marshals/marshal/bignum_2_exp_33.rxdata",
-		L"marshals/marshal/bignum_2_exp_34.rxdata",
-		L"marshals/marshal/bignum_2_exp_99.rxdata",
-		L"marshals/marshal/bignum_2_exp_100.rxdata",
-		L"marshals/marshal/bignum_2_exp_200.rxdata",
-		L"marshals/marshal/float_0.999999999999.rxdata",
-		L"marshals/marshal/float_1.0.rxdata",
-		L"marshals/marshal/float_3.141592.rxdata",
-		L"marshals/marshal/float_inf.rxdata",
-		L"marshals/marshal/float_-inf.rxdata",
-		L"marshals/marshal/float_nan.rxdata",
-		L"marshals/marshal/struct_customer.rxdata",
-		L"marshals/marshal/struct_abc_chocolate.rxdata",
-		L"marshals/marshal/struct_customer_instance_dave.rxdata",
-		L"marshals/marshal/class_abc_chocolate_instance.rxdata",
-		L"marshals/marshal/array_nested1.rxdata",
-		L"marshals/marshal/array_nested2.rxdata",
-		L"marshals/marshal/array_two_same_symbols.rxdata",
-		L"marshals/marshal/array_two_same_strings.rxdata",
-		L"marshals/marshal/game_system_instance.rxdata",
+		//L"marshals/marshal/nil.rxdata",
+		//L"marshals/marshal/true.rxdata",
+		//L"marshals/marshal/false.rxdata",
+		//L"marshals/marshal/0x12345678.rxdata",
+		//L"marshals/marshal/String_abcd.rxdata",
+		//L"marshals/marshal/String_0123가나다라ABCD.rxdata",
+		//L"marshals/marshal/String_empty.rxdata",
+		//L"marshals/marshal/String_long063.rxdata",
+		//L"marshals/marshal/array_empty.rxdata",
+		//L"marshals/marshal/array_2d.rxdata",
+		//L"marshals/marshal/hash_new.rxdata",
+		//L"marshals/marshal/hash_simple.rxdata",
+		//L"marshals/marshal/hash_simple2.rxdata",
+		//L"marshals/marshal/hash_simple3.rxdata",
+		//L"marshals/marshal/hash_new_0.rxdata",
+		//L"marshals/marshal/hash_new_32.rxdata",
+		//L"marshals/marshal/hash_new_default_key_val.rxdata",
+		//L"marshals/marshal/bignum_2_exp_30.rxdata",
+		//L"marshals/marshal/bignum_2_exp_31.rxdata",
+		//L"marshals/marshal/bignum_2_exp_32.rxdata",
+		//L"marshals/marshal/bignum_2_exp_33.rxdata",
+		//L"marshals/marshal/bignum_2_exp_34.rxdata",
+		//L"marshals/marshal/bignum_2_exp_99.rxdata",
+		//L"marshals/marshal/bignum_2_exp_100.rxdata",
+		//L"marshals/marshal/bignum_2_exp_200.rxdata",
+		//L"marshals/marshal/float_0.999999999999.rxdata",
+		//L"marshals/marshal/float_1.0.rxdata",
+		//L"marshals/marshal/float_3.141592.rxdata",
+		//L"marshals/marshal/float_inf.rxdata",
+		//L"marshals/marshal/float_-inf.rxdata",
+		//L"marshals/marshal/float_nan.rxdata",
+		//L"marshals/marshal/struct_customer.rxdata",
+		//L"marshals/marshal/struct_abc_chocolate.rxdata",
+		//L"marshals/marshal/struct_customer_instance_dave.rxdata",
+		//L"marshals/marshal/class_abc_chocolate_instance.rxdata",
+		//L"marshals/marshal/array_nested1.rxdata",
+		//L"marshals/marshal/array_nested2.rxdata",
+		//L"marshals/marshal/array_two_same_symbols.rxdata",
+		//L"marshals/marshal/array_two_same_strings.rxdata",
+		L"marshals/marshal/testset_instance.rxdata",
+		//L"marshals/marshal/game_system_instance.rxdata",
 	};
 
 	rootObjectPtrs.reserve(10000);
@@ -89,11 +89,15 @@ int wmain(const int argc, const wchar_t* argv[])
 		{
 			rootObjectPtrs.clear();
 			RubyObject::sObjectReferences.clear();
+			RubyObject::sObjectReferences.push_back(nullptr);
 			RubySymbol::sSymbolLinks.clear();
 			StartParse(paBuf, bufSize, rootObjectPtrs);
 			delete[] paBuf;
 			paBuf = nullptr;
-			PrintRxdataRecursive(rootObjectPtrs, 0);
+			for (const RubyBase* pRubyBase : rootObjectPtrs)
+			{
+				PrintRxdataRecursive(pRubyBase, 0);
+			}
 		}
 		else
 		{
@@ -170,7 +174,11 @@ bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vec
 	}
 	++pToken;
 
-	return ParseRecursive(&pToken, pEnd, currentObjectPtrs);
+	ParseRecursive(&pToken, pEnd, currentObjectPtrs);
+
+	//assert(pToken >= pEnd);
+
+	return true;
 }
 
 bool ProcessFixnum(unsigned char** ppToken, int* outVal)
@@ -377,12 +385,6 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	std::vector<RubyBase*>* paChildObjectPtrs;
 	int hashDefault = 0;
 
-	assert(*ppToken <= pEnd);
-	if (*ppToken == pEnd)
-	{
-		return true;
-	}
-
 	switch (static_cast<eRubyTokens>(**ppToken))
 	{
 	case eRubyTokens::TYPE_NIL:
@@ -401,7 +403,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		break;
 
 	case eRubyTokens::TYPE_FIXNUM:
-		++(*ppToken); 
+		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
 		currentObjectPtrs.push_back(new RubyFixnum(val));
 		break;
@@ -450,7 +452,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 		ProcessFixnum(ppToken, &val);
 		val *= 2;
-			
+
 		paBuffer = new char[val];
 		memcpy(paBuffer, *ppToken, val);
 		currentObjectPtrs.push_back(new RubyBignum(bSignBignum, val, paBuffer));
@@ -472,7 +474,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 	case eRubyTokens::TYPE_CLASS: // Struct, Class Declaration
 		++(*ppToken);
-			
+
 		ProcessFixnum(ppToken, &val);
 
 		paBuffer = new char[val];
@@ -517,17 +519,52 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	case eRubyTokens::TYPE_OBJECT:
 		++(*ppToken);
 
-		assert(**ppToken == ':');
-		++(*ppToken);
-		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+		if (**ppToken == ':')
+		{
+			++(*ppToken);
+			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+			ProcessFixnum(ppToken, &val);
+			val *= 2;
+			paChildObjectPtrs = new std::vector<RubyBase*>();
+			paChildObjectPtrs->reserve(val);
+ 			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, true));
 
-		currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength));
+			for (repCount = 0; repCount < val; ++repCount)
+			{
+				ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+			}
+		}
+		else if (**ppToken == ';')
+		{
+			++(*ppToken);
+			ProcessFixnum(ppToken, &val);
+
+			assert(RubyBase::sObjectReferences[val]->Type == eRubyTokens::TYPE_OBJECT);
+			RubyObject* pReferencedObject = (RubyObject*)RubyBase::sObjectReferences[val];
+
+			ProcessFixnum(ppToken, &val); // membercount
+			val *= 2;
+
+			paChildObjectPtrs = new std::vector<RubyBase*>();
+			paChildObjectPtrs->reserve(val);
+			currentObjectPtrs.push_back(new RubyObject(pReferencedObject->PAClassName, pReferencedObject->ClassNameLength, paChildObjectPtrs, val, false));
+
+			for (repCount = 0; repCount < val; ++repCount)
+			{
+				ParseRecursive(ppToken, pEnd, *paChildObjectPtrs);
+			}
+		}
+		else
+		{
+			assert(false);
+		}
 
 		break;
 
 	case eRubyTokens::TYPE_LINK:
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
+		val += 1;
 		currentObjectPtrs.push_back(RubyBase::sObjectReferences[val]);
 		break;
 
@@ -599,116 +636,125 @@ const wchar_t* RubyTokenToString(const eRubyTokens token)
 	}
 }
 
-void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int indent)
+void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 {
-	for (const RubyBase* pObject : refObjects)
+	for (int i = 0; i < indent; ++i)
 	{
+		wprintf(L"  ");
+	}
+	switch (pRubyBase->Type)
+	{
+	case eRubyTokens::TYPE_NIL:
+		wprintf(L"nil\n");
+		break;
+	case eRubyTokens::TYPE_TRUE:
+		wprintf(L"true\n");
+		break;
+	case eRubyTokens::TYPE_FALSE:
+		wprintf(L"false\n");
+		break;
+	case eRubyTokens::TYPE_FIXNUM:
+		wprintf(L"%d\n", *static_cast<int*>(pRubyBase->PAPtr));
+		break;
+	case eRubyTokens::TYPE_EXTENDED:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_UCLASS:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_OBJECT:
+		wprintf(L"object of class ");
+		fwrite(static_cast<const RubyObject*>(pRubyBase)->PAClassName, sizeof(char), static_cast<const RubyObject*>(pRubyBase)->ClassNameLength, stdout);
+		wprintf(L"\n");
+		for (RubyBase* pChild : *(std::vector<RubyBase*>*)(pRubyBase->PAPtr))
+		{
+			PrintRxdataRecursive(pChild, indent + 1);
+		}
+		break;
+	case eRubyTokens::TYPE_DATA:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_USERDEF:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_USRMARSHAL:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_FLOAT:
+		break;
+	case eRubyTokens::TYPE_BIGNUM:
+		break;
+	case eRubyTokens::TYPE_STRING:
+		wprintf(L"\"");
+		fwrite(static_cast<const RubyString*>(pRubyBase)->PAPtr, sizeof(char), static_cast<const RubyString*>(pRubyBase)->Size, stdout);
+		wprintf(L"\"\n");
+		break;
+	case eRubyTokens::TYPE_REGEXP:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_ARRAY:
+		wprintf(L"[\n");
+		for (RubyBase* pChild : *(std::vector<RubyBase*>*)(pRubyBase->PAPtr))
+		{
+			PrintRxdataRecursive(pChild, indent + 1);
+		}
 		for (int i = 0; i < indent; ++i)
 		{
 			wprintf(L"  ");
 		}
-		switch (pObject->Type)
+		wprintf(L"]\n");
+		break;
+	case eRubyTokens::TYPE_HASH:
+		wprintf(L"{\n");
+		for (RubyBase* pChild : *(std::vector<RubyBase*>*)(pRubyBase->PAPtr))
 		{
-		case eRubyTokens::TYPE_NIL:
-			wprintf(L"nil\n");
-			break;
-		case eRubyTokens::TYPE_TRUE:
-			wprintf(L"true\n");
-			break;
-		case eRubyTokens::TYPE_FALSE:
-			wprintf(L"false\n");
-			break;
-		case eRubyTokens::TYPE_FIXNUM:
-			wprintf(L"%d\n", *static_cast<int*>(pObject->PAPtr));
-			break;
-		case eRubyTokens::TYPE_EXTENDED:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_UCLASS:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_OBJECT:
-			wprintf(L"object of class ");
-			fwrite(static_cast<const RubyObject*>(pObject)->PAClassName, sizeof(char), static_cast<const RubyObject*>(pObject)->ClassNameLength, stdout);
-			wprintf(L"\n");
-			break;
-		case eRubyTokens::TYPE_DATA:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_USERDEF:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_USRMARSHAL:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_FLOAT:
-			break;
-		case eRubyTokens::TYPE_BIGNUM:
-			break;
-		case eRubyTokens::TYPE_STRING:
-			wprintf(L"\"");
-			fwrite(static_cast<const RubyString*>(pObject)->PAPtr, sizeof(char), static_cast<const RubyString*>(pObject)->Size, stdout);
-			wprintf(L"\"\n");
-			break;
-		case eRubyTokens::TYPE_REGEXP:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_ARRAY:
-			wprintf(L"[\n");
-			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
-			for (int i = 0; i < indent; ++i)
-			{
-				wprintf(L"  ");
-			}
-			wprintf(L"]\n");
-			break;
-		case eRubyTokens::TYPE_HASH:
-			wprintf(L"{\n");
-			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
-			for (int i = 0; i < indent; ++i)
-			{
-				wprintf(L"  ");
-			}
-			wprintf(L"}\n");
-			break;
-		case eRubyTokens::TYPE_HASH_DEF:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_STRUCT:
-			fwrite(static_cast<const RubyStruct*>(pObject)->PAStructName, sizeof(char), static_cast<const RubyStruct*>(pObject)->StructNameLength, stdout);
-			wprintf(L" = Struct.new\n{\n");
-			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
-			wprintf(L"}\n");
-			break;
-		case eRubyTokens::TYPE_MODULE_OLD:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_CLASS:
-			wprintf(L"class ");
-			fwrite(static_cast<const RubyClass*>(pObject)->PAPtr, sizeof(char), static_cast<const RubyClass*>(pObject)->ClassNameLength, stdout);
-			wprintf(L"\n");
-			break;
-		case eRubyTokens::TYPE_MODULE:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_SYMBOL:
-			wprintf(L":");
-			fwrite(static_cast<const RubySymbol*>(pObject)->PAPtr, sizeof(char), static_cast<const RubySymbol*>(pObject)->SymbolNameLength, stdout);
-			wprintf(L"\n");
-			break;
-		case eRubyTokens::TYPE_SYMLINK:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_IVAR:
-			assert(0);
-			break;
-		case eRubyTokens::TYPE_LINK:
-			assert(0);
-			break;
-		default:
-			assert(0);
-			break;
+			PrintRxdataRecursive(pChild, indent + 1);
 		}
-		
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		wprintf(L"}\n");
+		break;
+	case eRubyTokens::TYPE_HASH_DEF:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_STRUCT:
+		fwrite(static_cast<const RubyStruct*>(pRubyBase)->PAStructName, sizeof(char), static_cast<const RubyStruct*>(pRubyBase)->StructNameLength, stdout);
+		wprintf(L" = Struct.new\n{\n");
+		for (RubyBase* pChild : *(std::vector<RubyBase*>*)(pRubyBase->PAPtr))
+		{
+			PrintRxdataRecursive(pChild, indent + 1);
+		}
+		wprintf(L"}\n");
+		break;
+	case eRubyTokens::TYPE_MODULE_OLD:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_CLASS:
+		wprintf(L"class ");
+		fwrite(static_cast<const RubyClass*>(pRubyBase)->PAPtr, sizeof(char), static_cast<const RubyClass*>(pRubyBase)->ClassNameLength, stdout);
+		wprintf(L"\n");
+		break;
+	case eRubyTokens::TYPE_MODULE:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_SYMBOL:
+		wprintf(L":");
+		fwrite(static_cast<const RubySymbol*>(pRubyBase)->PAPtr, sizeof(char), static_cast<const RubySymbol*>(pRubyBase)->SymbolNameLength, stdout);
+		wprintf(L"\n");
+		break;
+	case eRubyTokens::TYPE_SYMLINK:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_IVAR:
+		assert(0);
+		break;
+	case eRubyTokens::TYPE_LINK:
+		assert(0);
+		break;
+	default:
+		assert(0);
+		break;
 	}
 }
