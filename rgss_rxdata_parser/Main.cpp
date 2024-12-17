@@ -88,6 +88,8 @@ int wmain(const int argc, const wchar_t* argv[])
 		if (ReadBytes(pFileName, &paBuf, &bufSize))
 		{
 			rootObjectPtrs.clear();
+			RubyObject::sObjectReferences.clear();
+			RubySymbol::sSymbolLinks.clear();
 			StartParse(paBuf, bufSize, rootObjectPtrs);
 			delete[] paBuf;
 			paBuf = nullptr;
@@ -95,7 +97,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		}
 		else
 		{
-			assert(false);
+			assert(0);
 		}
 		wprintf(L"----------------------------------\n\n");
 	}
@@ -526,13 +528,12 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	case eRubyTokens::TYPE_LINK:
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
-		val += 1;
 		currentObjectPtrs.push_back(RubyBase::sObjectReferences[val]);
 		break;
 
 	default:
 		wprintf(L"not registered token: %s\n", RubyTokenToString(static_cast<eRubyTokens>(**ppToken)));
-		assert(false);
+		assert(0);
 		return false;
 	}
 
@@ -618,7 +619,7 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 			wprintf(L"false\n");
 			break;
 		case eRubyTokens::TYPE_FIXNUM:
-			wprintf(L"0x%x\n", *static_cast<int*>(pObject->PAPtr));
+			wprintf(L"%d\n", *static_cast<int*>(pObject->PAPtr));
 			break;
 		case eRubyTokens::TYPE_EXTENDED:
 			assert(0);
@@ -627,7 +628,9 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 			assert(0);
 			break;
 		case eRubyTokens::TYPE_OBJECT:
-			wprintf(L"Fixnum(%d)\n", *static_cast<int*>(pObject->PAPtr));
+			wprintf(L"object of class ");
+			fwrite(reinterpret_cast<const RubyObject*>(pObject)->PAClassName, sizeof(char), reinterpret_cast<const RubyObject*>(pObject)->ClassNameLength, stdout);
+			wprintf(L"\n");
 			break;
 		case eRubyTokens::TYPE_DATA:
 			assert(0);
@@ -647,11 +650,11 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 			wprintf(L"\n");
 			break;
 		case eRubyTokens::TYPE_REGEXP:
+			assert(0);
 			break;
 		case eRubyTokens::TYPE_ARRAY:
 			wprintf(L"[\n");
 			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
-
 			for (int i = 0; i < indent; ++i)
 			{
 				wprintf(L"  ");
@@ -659,29 +662,50 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 			wprintf(L"]\n");
 			break;
 		case eRubyTokens::TYPE_HASH:
+			wprintf(L"{\n");
+			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"}\n");
 			break;
 		case eRubyTokens::TYPE_HASH_DEF:
+			assert(0);
 			break;
 		case eRubyTokens::TYPE_STRUCT:
+			fwrite(static_cast<const RubyStruct*>(pObject)->PAStructName, sizeof(char), static_cast<const RubyStruct*>(pObject)->StructNameLength, stdout);
+			wprintf(L" = Struct.new\n{\n");
+			PrintRxdataRecursive(*(std::vector<RubyBase*>*)(pObject->PAPtr), indent + 1);
+			wprintf(L"}\n");
 			break;
 		case eRubyTokens::TYPE_MODULE_OLD:
 			assert(0);
 			break;
 		case eRubyTokens::TYPE_CLASS:
+			wprintf(L"class ");
+			fwrite(static_cast<const RubyClass*>(pObject)->PAPtr, sizeof(char), static_cast<const RubyClass*>(pObject)->ClassNameLength, stdout);
+			wprintf(L"\n");
 			break;
 		case eRubyTokens::TYPE_MODULE:
 			assert(0);
 			break;
 		case eRubyTokens::TYPE_SYMBOL:
+			wprintf(L":");
+			fwrite(static_cast<const RubySymbol*>(pObject)->PAPtr, sizeof(char), static_cast<const RubySymbol*>(pObject)->SymbolNameLength, stdout);
+			wprintf(L"\n");
 			break;
 		case eRubyTokens::TYPE_SYMLINK:
+			assert(0);
 			break;
 		case eRubyTokens::TYPE_IVAR:
 			assert(0);
 			break;
 		case eRubyTokens::TYPE_LINK:
+			assert(0);
 			break;
 		default:
+			assert(0);
 			break;
 		}
 		

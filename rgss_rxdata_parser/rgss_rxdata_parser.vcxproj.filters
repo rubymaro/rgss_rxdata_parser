@@ -48,6 +48,21 @@
     <ClCompile Include="RubyStruct.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RubyFalse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyFixnum.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyNil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyTrue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubyBase.h">
@@ -75,6 +90,21 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="RubyStruct.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyFalse.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyFixnum.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyNil.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyObject.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyTrue.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
