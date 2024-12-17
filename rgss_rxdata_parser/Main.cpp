@@ -646,8 +646,9 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 		case eRubyTokens::TYPE_BIGNUM:
 			break;
 		case eRubyTokens::TYPE_STRING:
+			wprintf(L"\"");
 			fwrite(static_cast<const RubyString*>(pObject)->PAPtr, sizeof(char), static_cast<const RubyString*>(pObject)->Size, stdout);
-			wprintf(L"\n");
+			wprintf(L"\"\n");
 			break;
 		case eRubyTokens::TYPE_REGEXP:
 			assert(0);
