@@ -629,7 +629,7 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 			break;
 		case eRubyTokens::TYPE_OBJECT:
 			wprintf(L"object of class ");
-			fwrite(reinterpret_cast<const RubyObject*>(pObject)->PAClassName, sizeof(char), reinterpret_cast<const RubyObject*>(pObject)->ClassNameLength, stdout);
+			fwrite(static_cast<const RubyObject*>(pObject)->PAClassName, sizeof(char), static_cast<const RubyObject*>(pObject)->ClassNameLength, stdout);
 			wprintf(L"\n");
 			break;
 		case eRubyTokens::TYPE_DATA:
@@ -646,7 +646,7 @@ void PrintRxdataRecursive(const std::vector<RubyBase*>& refObjects, const int in
 		case eRubyTokens::TYPE_BIGNUM:
 			break;
 		case eRubyTokens::TYPE_STRING:
-			fwrite(reinterpret_cast<const RubyString*>(pObject)->PAPtr, sizeof(char), reinterpret_cast<const RubyString*>(pObject)->Size, stdout);
+			fwrite(static_cast<const RubyString*>(pObject)->PAPtr, sizeof(char), static_cast<const RubyString*>(pObject)->Size, stdout);
 			wprintf(L"\n");
 			break;
 		case eRubyTokens::TYPE_REGEXP:
