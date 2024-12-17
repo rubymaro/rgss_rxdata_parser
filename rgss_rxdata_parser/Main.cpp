@@ -75,8 +75,8 @@ int wmain(const int argc, const wchar_t* argv[])
 		//L"marshals/marshal/array_nested2.rxdata",
 		//L"marshals/marshal/array_two_same_symbols.rxdata",
 		//L"marshals/marshal/array_two_same_strings.rxdata",
-		L"marshals/marshal/testset_instance.rxdata",
-		//L"marshals/marshal/game_system_instance.rxdata",
+		//L"marshals/marshal/testset_instance.rxdata",
+		L"marshals/marshal/game_system_instance.rxdata",
 	};
 
 	rootObjectPtrs.reserve(10000);
@@ -176,7 +176,7 @@ bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vec
 
 	ParseRecursive(&pToken, pEnd, currentObjectPtrs);
 
-	//assert(pToken >= pEnd);
+	assert(pToken >= pEnd);
 
 	return true;
 }
@@ -384,6 +384,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	bool bSignBignum;
 	std::vector<RubyBase*>* paChildObjectPtrs;
 	int hashDefault = 0;
+	RubySymbol* paRubySymbol;
 
 	switch (static_cast<eRubyTokens>(**ppToken))
 	{
@@ -487,7 +488,9 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	case eRubyTokens::TYPE_SYMBOL:
 		++(*ppToken);
 		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
-		currentObjectPtrs.push_back(new RubySymbol(paBuffer, bufferLength));
+		paRubySymbol = new RubySymbol(paBuffer, bufferLength);
+		currentObjectPtrs.push_back(paRubySymbol);
+		RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 		break;
 
 	case eRubyTokens::TYPE_SYMLINK:
@@ -527,7 +530,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			val *= 2;
 			paChildObjectPtrs = new std::vector<RubyBase*>();
 			paChildObjectPtrs->reserve(val);
- 			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, true));
+			RubySymbol::sSymbolLinks.push_back(new RubySymbol(paBuffer, bufferLength));
+			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, true));
 
 			for (repCount = 0; repCount < val; ++repCount)
 			{
@@ -539,15 +543,14 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
 
-			assert(RubyBase::sObjectReferences[val]->Type == eRubyTokens::TYPE_OBJECT);
-			RubyObject* pReferencedObject = (RubyObject*)RubyBase::sObjectReferences[val];
+			RubySymbol* pLinkedSymbol = RubySymbol::sSymbolLinks[val];
 
 			ProcessFixnum(ppToken, &val); // membercount
 			val *= 2;
 
 			paChildObjectPtrs = new std::vector<RubyBase*>();
 			paChildObjectPtrs->reserve(val);
-			currentObjectPtrs.push_back(new RubyObject(pReferencedObject->PAClassName, pReferencedObject->ClassNameLength, paChildObjectPtrs, val, false));
+			currentObjectPtrs.push_back(new RubyObject((char*)pLinkedSymbol->PAPtr, pLinkedSymbol->SymbolNameLength, paChildObjectPtrs, val, true));
 
 			for (repCount = 0; repCount < val; ++repCount)
 			{
