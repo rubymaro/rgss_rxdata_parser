@@ -1,5 +1,6 @@
 ﻿#include <cstdio>
 #include <cassert>
+#include <clocale>
 #include <strsafe.h>
 #include <vector>
 #include <Windows.h>
@@ -19,7 +20,8 @@
 #include "RubySymbol.h"
 #include "RubyStruct.h"
 #include "RubyObject.h"
-#include <clocale>
+#include "RubyUserDefined.h"
+#include "RubyTable.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
@@ -76,7 +78,23 @@ int wmain(const int argc, const wchar_t* argv[])
 		//L"marshals/marshal/array_two_same_symbols.rxdata",
 		//L"marshals/marshal/array_two_same_strings.rxdata",
 		//L"marshals/marshal/testset_instance.rxdata",
-		L"marshals/marshal/game_system_instance.rxdata",
+		//L"marshals/marshal/game_system_instance.rxdata",
+		//L"marshals/Data/Actors.rxdata",
+		//L"marshals/Data/Animations.rxdata",
+		//L"marshals/Data/Armors.rxdata",
+		//L"marshals/Data/Classes.rxdata",
+		//L"marshals/Data/CommonEvents.rxdata",
+		//L"marshals/Data/Enemies.rxdata",
+		//L"marshals/Data/Items.rxdata", // ok
+		L"marshals/Data/Map001.rxdata",
+		//L"marshals/Data/MapInfos.rxdata", // ok
+		//L"marshals/Data/Scripts.rxdata",
+		//L"marshals/Data/Skills.rxdata", // ok
+		//L"marshals/Data/States.rxdata", // ok
+		//L"marshals/Data/System.rxdata", // ok
+		//L"marshals/Data/Tilesets.rxdata",
+		//L"marshals/Data/Troops.rxdata", // ok
+		//L"marshals/Data/Weapons.rxdata", // ok
 	};
 
 	rootObjectPtrs.reserve(10000);
@@ -545,7 +563,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 			RubySymbol* pLinkedSymbol = RubySymbol::sSymbolLinks[val];
 
-			ProcessFixnum(ppToken, &val); // membercount
+			ProcessFixnum(ppToken, &val); // member count
 			val *= 2;
 
 			paChildObjectPtrs = new std::vector<RubyBase*>();
@@ -569,6 +587,38 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		ProcessFixnum(ppToken, &val);
 		val += 1;
 		currentObjectPtrs.push_back(RubyBase::sObjectReferences[val]);
+		break;
+
+	case eRubyTokens::TYPE_USERDEF:
+		++(*ppToken);
+
+		ProcessFixnum(ppToken, &val);
+		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+
+		if (memcmp(paBuffer, "Table", bufferLength) == 0)
+		{
+			unsigned char sizeofLength;
+			unsigned short dataTotalSize;
+			char* paDataBuffer;
+
+			sizeofLength = (*ppToken)[0];
+			assert(sizeofLength == 2);
+
+			dataTotalSize = (*ppToken)[2] << 8 | (*ppToken)[1];
+			*ppToken += 3;
+
+			paDataBuffer = static_cast<char*>(malloc(dataTotalSize));
+			memcpy(paDataBuffer, *ppToken, dataTotalSize);
+
+			currentObjectPtrs.push_back(new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, dataTotalSize));
+
+			*ppToken += dataTotalSize;
+		}
+		else
+		{
+			assert(0);
+		}
+
 		break;
 
 	default:
@@ -641,6 +691,8 @@ const wchar_t* RubyTokenToString(const eRubyTokens token)
 
 void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 {
+	RubyTable* pRubyTable;
+
 	for (int i = 0; i < indent; ++i)
 	{
 		wprintf(L"  ");
@@ -678,7 +730,41 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_USERDEF:
-		assert(0);
+		wprintf(L"User-defined class ");
+		fwrite(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, sizeof(char), static_cast<const RubyUserDefined*>(pRubyBase)->ClassNameLength, stdout);
+		wprintf(L"\n");
+		pRubyTable = reinterpret_cast<RubyTable*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
+		
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		wprintf(L"- Dimension = %u\n", pRubyTable->Dimension);
+
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		wprintf(L"- SizeX = %u\n", pRubyTable->SizeX);
+
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		wprintf(L"- SizeY = %u\n", pRubyTable->SizeY);
+
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		wprintf(L"- SizeZ = %u\n", pRubyTable->SizeZ);
+
+		for (int i = 0; i < indent; ++i)
+		{
+			wprintf(L"  ");
+		}
+		wprintf(L"- ElementCount = %u\n", pRubyTable->ElementCount);
+
 		break;
 	case eRubyTokens::TYPE_USRMARSHAL:
 		assert(0);

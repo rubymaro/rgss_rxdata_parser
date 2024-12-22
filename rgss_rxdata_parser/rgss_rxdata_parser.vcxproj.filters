@@ -5,107 +5,114 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    <Filter Include="Ruby">
+      <UniqueIdentifier>{26779423-1428-4221-8ede-babb0ce22296}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="RubyUserDefined">
+      <UniqueIdentifier>{11cce534-935d-4520-9679-c20e6f9a7f51}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="eRubyTokens.h">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="RubyArray.cpp">
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RubyString.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RubyArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RubyHash.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyBignum.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RubyFloat.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RubySymbol.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RubyStruct.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyFalse.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyFixnum.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyFloat.cpp">
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyHash.cpp">
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyNil.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyString.cpp">
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyStruct.cpp">
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="RubySymbol.cpp">
+      <Filter>Ruby</Filter>
     </ClCompile>
     <ClCompile Include="RubyTrue.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="eRubyTokens.h">
+      <Filter>Ruby</Filter>
+    </ClCompile>
+    <ClCompile Include="RubyUserDefined.cpp">
+      <Filter>RubyUserDefined</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="RubyBase.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RubyString.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="RubyArray.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClInclude>
-    <ClInclude Include="RubyHash.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="RubyBase.h">
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyBignum.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RubyFloat.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyClass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RubySymbol.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RubyStruct.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyFalse.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyFixnum.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyFloat.h">
+      <Filter>Ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyHash.h">
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyNil.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyObject.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyString.h">
+      <Filter>Ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyStruct.h">
+      <Filter>Ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="RubySymbol.h">
+      <Filter>Ruby</Filter>
     </ClInclude>
     <ClInclude Include="RubyTrue.h">
-      <Filter>Source Files</Filter>
+      <Filter>Ruby</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyUserDefined.h">
+      <Filter>RubyUserDefined</Filter>
+    </ClInclude>
+    <ClInclude Include="RubyTable.h">
+      <Filter>RubyUserDefined</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
