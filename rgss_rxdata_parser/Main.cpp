@@ -82,11 +82,11 @@ int wmain(const int argc, const wchar_t* argv[])
 		//L"marshals/Data/Actors.rxdata",
 		//L"marshals/Data/Animations.rxdata",
 		//L"marshals/Data/Armors.rxdata",
-		//L"marshals/Data/Classes.rxdata",
+		L"marshals/Data/Classes.rxdata",
 		//L"marshals/Data/CommonEvents.rxdata",
 		//L"marshals/Data/Enemies.rxdata",
 		//L"marshals/Data/Items.rxdata", // ok
-		L"marshals/Data/Map001.rxdata",
+		//L"marshals/Data/Map001.rxdata",
 		//L"marshals/Data/MapInfos.rxdata", // ok
 		//L"marshals/Data/Scripts.rxdata",
 		//L"marshals/Data/Skills.rxdata", // ok
@@ -602,17 +602,26 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			char* paDataBuffer;
 
 			sizeofLength = (*ppToken)[0];
-			assert(sizeofLength == 2);
 
-			dataTotalSize = (*ppToken)[2] << 8 | (*ppToken)[1];
-			*ppToken += 3;
+			if (sizeofLength == ';')
+			{
+				*ppToken += 1;
 
-			paDataBuffer = static_cast<char*>(malloc(dataTotalSize));
-			memcpy(paDataBuffer, *ppToken, dataTotalSize);
+			}
+			else
+			{
+				assert(sizeofLength == 2);
 
-			currentObjectPtrs.push_back(new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, dataTotalSize));
+				dataTotalSize = (*ppToken)[2] << 8 | (*ppToken)[1];
+				*ppToken += 3;
 
-			*ppToken += dataTotalSize;
+				paDataBuffer = static_cast<char*>(malloc(dataTotalSize));
+				memcpy(paDataBuffer, *ppToken, dataTotalSize);
+
+				currentObjectPtrs.push_back(new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, dataTotalSize));
+
+				*ppToken += dataTotalSize;
+			}
 		}
 		else
 		{
