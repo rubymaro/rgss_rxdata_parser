@@ -11,6 +11,6 @@ struct RubyTable final
 	uint32_t ElementCount;
 #pragma warning(push)
 #pragma warning(disable : 4200)
-	int16_t PElement[0];
+	int16_t Elements[0];
 #pragma warning(pop)
 };
