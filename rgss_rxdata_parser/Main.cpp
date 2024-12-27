@@ -591,41 +591,46 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 	case eRubyTokens::TYPE_USERDEF:
 		++(*ppToken);
-
-		ProcessFixnum(ppToken, &val);
-		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
-
-		if (memcmp(paBuffer, "Table", bufferLength) == 0)
+		
+		if ((*ppToken)[0] == ';')
 		{
-			unsigned char sizeofLength;
-			unsigned short dataTotalSize;
-			char* paDataBuffer;
-
-			sizeofLength = (*ppToken)[0];
-
-			if (sizeofLength == ';')
+			++(*ppToken);
+			ProcessFixnum(ppToken, &val);
+			assert(RubyBase::sObjectReferences[val]->Type == eRubyTokens::TYPE_USERDEF);
+			RubyUserDefined* pRubyUserDefinedTable = static_cast<RubyUserDefined*>(RubyBase::sObjectReferences[val]);
+			if (pRubyUserDefinedTable->ClassNameLength == 5 && memcmp(pRubyUserDefinedTable->PAClassName, "Table", pRubyUserDefinedTable->ClassNameLength) == 0)
 			{
-				*ppToken += 1;
+				char* paDataBuffer;
 
-			}
-			else
-			{
-				assert(sizeofLength == 2);
+				ProcessFixnum(ppToken, &val);
+				paDataBuffer = static_cast<char*>(malloc(val));
+				memcpy(paDataBuffer, *ppToken, val);
 
-				dataTotalSize = (*ppToken)[2] << 8 | (*ppToken)[1];
-				*ppToken += 3;
+				currentObjectPtrs.push_back(new RubyUserDefined(pRubyUserDefinedTable->PAClassName, pRubyUserDefinedTable->ClassNameLength, paDataBuffer, val));
 
-				paDataBuffer = static_cast<char*>(malloc(dataTotalSize));
-				memcpy(paDataBuffer, *ppToken, dataTotalSize);
-
-				currentObjectPtrs.push_back(new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, dataTotalSize));
-
-				*ppToken += dataTotalSize;
+				*ppToken += val;
 			}
 		}
 		else
 		{
-			assert(0);
+			++(*ppToken);
+			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+
+			if (memcmp(paBuffer, "Table", bufferLength) == 0)
+			{
+				char* paDataBuffer;
+
+				ProcessFixnum(ppToken, &val);
+				paDataBuffer = static_cast<char*>(malloc(val));
+				memcpy(paDataBuffer, *ppToken, val);
+
+				RubyBase* paRubyUserDefined = new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, val);
+
+				currentObjectPtrs.push_back(paRubyUserDefined);
+				RubyObject::sObjectReferences.push_back(paRubyUserDefined);
+
+				*ppToken += val;
+			}
 		}
 
 		break;
