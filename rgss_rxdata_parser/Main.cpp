@@ -597,8 +597,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
 
-			RubySymbol* pRubyUserDefinedTable = RubySymbol::sSymbolLinks[val];
-			if (pRubyUserDefinedTable->SymbolNameLength == 5 && memcmp(pRubyUserDefinedTable->PAPtr, "Table", pRubyUserDefinedTable->SymbolNameLength) == 0)
+			RubySymbol* pRubyUserDefinedSymbol = RubySymbol::sSymbolLinks[val];
+			if (pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Table", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
 			{
 				char* paDataBuffer;
 
@@ -606,7 +606,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 				paDataBuffer = static_cast<char*>(malloc(val));
 				memcpy(paDataBuffer, *ppToken, val);
 
-				currentObjectPtrs.push_back(new RubyUserDefined((char*)pRubyUserDefinedTable->PAPtr, pRubyUserDefinedTable->SymbolNameLength, paDataBuffer, val));
+				currentObjectPtrs.push_back(new RubyUserDefined((char*)pRubyUserDefinedSymbol->PAPtr, pRubyUserDefinedSymbol->SymbolNameLength, paDataBuffer, val));
 
 				*ppToken += val;
 			}
