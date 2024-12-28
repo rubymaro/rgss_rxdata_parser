@@ -549,7 +549,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			paChildObjectPtrs = new std::vector<RubyBase*>();
 			paChildObjectPtrs->reserve(val);
 			RubySymbol::sSymbolLinks.push_back(new RubySymbol(paBuffer, bufferLength));
-			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, true));
+			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, false));
 
 			for (repCount = 0; repCount < val; ++repCount)
 			{
@@ -592,10 +592,11 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 	case eRubyTokens::TYPE_USERDEF:
 		++(*ppToken);
 		
-		if ((*ppToken)[0] == ';')
+		if (**ppToken == ';')
 		{
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
+
 			assert(RubyBase::sObjectReferences[val]->Type == eRubyTokens::TYPE_USERDEF);
 			RubyUserDefined* pRubyUserDefinedTable = static_cast<RubyUserDefined*>(RubyBase::sObjectReferences[val]);
 			if (pRubyUserDefinedTable->ClassNameLength == 5 && memcmp(pRubyUserDefinedTable->PAClassName, "Table", pRubyUserDefinedTable->ClassNameLength) == 0)
@@ -610,11 +611,14 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 				*ppToken += val;
 			}
+			
 		}
 		else
 		{
 			++(*ppToken);
 			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+			paRubySymbol = new RubySymbol(paBuffer, bufferLength);
+			RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 
 			if (memcmp(paBuffer, "Table", bufferLength) == 0)
 			{
