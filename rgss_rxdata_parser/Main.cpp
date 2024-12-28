@@ -79,20 +79,20 @@ int wmain(const int argc, const wchar_t* argv[])
 		//L"marshals/marshal/array_two_same_strings.rxdata",
 		//L"marshals/marshal/testset_instance.rxdata",
 		//L"marshals/marshal/game_system_instance.rxdata",
-		//L"marshals/Data/Actors.rxdata",
-		//L"marshals/Data/Animations.rxdata",
-		//L"marshals/Data/Armors.rxdata",
-		L"marshals/Data/Classes.rxdata",
-		//L"marshals/Data/CommonEvents.rxdata",
-		//L"marshals/Data/Enemies.rxdata",
+		//L"marshals/Data/Actors.rxdata", // ok
+		L"marshals/Data/Animations.rxdata",
+		//L"marshals/Data/Armors.rxdata", // ok
+		//L"marshals/Data/Classes.rxdata", // ok
+		//L"marshals/Data/CommonEvents.rxdata", // ok
+		//L"marshals/Data/Enemies.rxdata", // ok
 		//L"marshals/Data/Items.rxdata", // ok
-		//L"marshals/Data/Map001.rxdata",
+		//L"marshals/Data/Map001.rxdata", // ok
 		//L"marshals/Data/MapInfos.rxdata", // ok
 		//L"marshals/Data/Scripts.rxdata",
 		//L"marshals/Data/Skills.rxdata", // ok
 		//L"marshals/Data/States.rxdata", // ok
 		//L"marshals/Data/System.rxdata", // ok
-		//L"marshals/Data/Tilesets.rxdata",
+		//L"marshals/Data/Tilesets.rxdata", // ok
 		//L"marshals/Data/Troops.rxdata", // ok
 		//L"marshals/Data/Weapons.rxdata", // ok
 	};
@@ -549,7 +549,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			paChildObjectPtrs = new std::vector<RubyBase*>();
 			paChildObjectPtrs->reserve(val);
 			RubySymbol::sSymbolLinks.push_back(new RubySymbol(paBuffer, bufferLength));
-			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, false));
+			currentObjectPtrs.push_back(new RubyObject(paBuffer, bufferLength, paChildObjectPtrs, val, true));
 
 			for (repCount = 0; repCount < val; ++repCount)
 			{
@@ -597,9 +597,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			++(*ppToken);
 			ProcessFixnum(ppToken, &val);
 
-			assert(RubyBase::sObjectReferences[val]->Type == eRubyTokens::TYPE_USERDEF);
-			RubyUserDefined* pRubyUserDefinedTable = static_cast<RubyUserDefined*>(RubyBase::sObjectReferences[val]);
-			if (pRubyUserDefinedTable->ClassNameLength == 5 && memcmp(pRubyUserDefinedTable->PAClassName, "Table", pRubyUserDefinedTable->ClassNameLength) == 0)
+			RubySymbol* pRubyUserDefinedTable = RubySymbol::sSymbolLinks[val];
+			if (pRubyUserDefinedTable->SymbolNameLength == 5 && memcmp(pRubyUserDefinedTable->PAPtr, "Table", pRubyUserDefinedTable->SymbolNameLength) == 0)
 			{
 				char* paDataBuffer;
 
@@ -607,7 +606,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 				paDataBuffer = static_cast<char*>(malloc(val));
 				memcpy(paDataBuffer, *ppToken, val);
 
-				currentObjectPtrs.push_back(new RubyUserDefined(pRubyUserDefinedTable->PAClassName, pRubyUserDefinedTable->ClassNameLength, paDataBuffer, val));
+				currentObjectPtrs.push_back(new RubyUserDefined((char*)pRubyUserDefinedTable->PAPtr, pRubyUserDefinedTable->SymbolNameLength, paDataBuffer, val));
 
 				*ppToken += val;
 			}
