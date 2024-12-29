@@ -117,5 +117,8 @@
     <ClInclude Include="RubyTable.h">
       <Filter>RubyUserDefined</Filter>
     </ClInclude>
+    <ClInclude Include="RubyTone.h">
+      <Filter>RubyUserDefined</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

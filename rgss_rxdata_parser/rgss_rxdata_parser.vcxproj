@@ -161,6 +161,7 @@
     <ClInclude Include="RubyStruct.h" />
     <ClInclude Include="RubySymbol.h" />
     <ClInclude Include="RubyTable.h" />
+    <ClInclude Include="RubyTone.h" />
     <ClInclude Include="RubyTrue.h" />
     <ClInclude Include="RubyUserDefined.h" />
   </ItemGroup>

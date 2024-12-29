@@ -23,9 +23,10 @@
 #include "RubyUserDefined.h"
 #include "RubyTable.h"
 #include "RubyColor.h"
+#include "RubyTone.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
-bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
+int64_t StartParse(unsigned char** ppaToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ProcessFixnum(unsigned char** ppToken, int* outVal);
 bool ProcessStringUTF8(unsigned char** ppToken, char** ppaString, size_t* pOutLength);
@@ -36,6 +37,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent);
 int wmain(const int argc, const wchar_t* argv[])
 {
 	unsigned char* paBuf;
+	unsigned char* pToken;
 	unsigned int bufSize;
 	std::vector<RubyBase*> rootObjectPtrs;
 	const wchar_t* ppFileNames[] = {
@@ -107,16 +109,38 @@ int wmain(const int argc, const wchar_t* argv[])
 		wprintf(L"Start reading \"%s\"\n", pFileName);
 		if (ReadBytes(pFileName, &paBuf, &bufSize))
 		{
-			rootObjectPtrs.clear();
-			RubyObject::sObjectReferences.clear();
-			RubyObject::sObjectReferences.push_back(nullptr);
-			RubySymbol::sSymbolLinks.clear();
-			StartParse(paBuf, bufSize, rootObjectPtrs);
-			delete[] paBuf;
-			paBuf = nullptr;
-			for (const RubyBase* pRubyBase : rootObjectPtrs)
+			pToken = paBuf;
+			while (true)
 			{
-				PrintRxdataRecursive(pRubyBase, 0);
+				rootObjectPtrs.clear();
+				RubyObject::sObjectReferences.clear();
+				RubyObject::sObjectReferences.push_back(nullptr);
+				RubySymbol::sSymbolLinks.clear();
+				int64_t ret = StartParse(&pToken, paBuf + bufSize, rootObjectPtrs);
+
+				for (const RubyBase* pRubyBase : rootObjectPtrs)
+				{
+					PrintRxdataRecursive(pRubyBase, 0);
+				}
+				wprintf(L"-----------------------------------------------------------------------\n");
+
+				if (ret < 0)
+				{
+					assert(0);
+					delete[] paBuf;
+					paBuf = nullptr;
+					break;
+				}
+				else if (ret == 0)
+				{
+					delete[] paBuf;
+					paBuf = nullptr;
+					break;
+				}
+				else
+				{
+					continue;
+				}
 			}
 		}
 		else
@@ -173,32 +197,26 @@ bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, uns
 	return bSuccess;
 }
 
-bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs)
+int64_t StartParse(unsigned char** ppToken, const unsigned char* const pEnd, std::vector<RubyBase*>& currentObjectPtrs)
 {
-	assert(paBuf != nullptr);
-	assert(bufSize > 0);
+	assert(ppToken != nullptr);
+	assert(pEnd != nullptr);
 
-	unsigned char* pToken = paBuf;
-	const unsigned char* const pEnd = paBuf + bufSize;
-
-	pToken = paBuf;
-	if (*pToken != MARSHAL_MAJOR)
+	if (**ppToken != MARSHAL_MAJOR)
 	{
-		return false;
+		return -1;
 	}
-	++pToken;
+	++(*ppToken);
 
-	if (*pToken != MARSHAL_MINOR)
+	if (**ppToken != MARSHAL_MINOR)
 	{
-		return false;
+		return -2;
 	}
-	++pToken;
+	++(*ppToken);
 
-	ParseRecursive(&pToken, pEnd, currentObjectPtrs);
+	ParseRecursive(ppToken, pEnd, currentObjectPtrs);
 
-	assert(pToken >= pEnd);
-
-	return true;
+	return pEnd - *ppToken;
 }
 
 bool ProcessFixnum(unsigned char** ppToken, int* outVal)
@@ -601,7 +619,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 			RubySymbol* pRubyUserDefinedSymbol = RubySymbol::sSymbolLinks[val];
 			if ((pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Table", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
-				|| (pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Color", pRubyUserDefinedSymbol->SymbolNameLength) == 0))
+				|| (pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Color", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
+				|| (pRubyUserDefinedSymbol->SymbolNameLength == 4 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Tone", pRubyUserDefinedSymbol->SymbolNameLength) == 0))
 			{
 				char* paDataBuffer;
 
@@ -623,7 +642,8 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 
 			if ((bufferLength == 5 && memcmp(paBuffer, "Table", bufferLength) == 0)
-				|| (bufferLength == 5 && memcmp(paBuffer, "Color", bufferLength) == 0))
+				|| (bufferLength == 5 && memcmp(paBuffer, "Color", bufferLength) == 0)
+				|| (bufferLength == 4 && memcmp(paBuffer, "Tone", bufferLength) == 0))
 			{
 				char* paDataBuffer;
 				ProcessFixnum(ppToken, &val);
@@ -800,7 +820,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 					for (uint32_t x = 0; x < pRubyTable->SizeX; ++x)
 					{
 						int16_t element = pRubyTable->Elements[x + y * pRubyTable->SizeX + z * pRubyTable->SizeX * pRubyTable->SizeY];
-						wprintf(L"%5hd ", element);
+						wprintf(L"%6hd ", element);
 					}
 					wprintf(L"\n");
 				}
@@ -820,6 +840,22 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 				static_cast<uint8_t>(pRubyColor->Green),
 				static_cast<uint8_t>(pRubyColor->Blue),
 				static_cast<uint8_t>(pRubyColor->Alpha)
+			);
+		}
+		else if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Tone", 4) == 0)
+		{
+			RubyTone* pRubyTone;
+			pRubyTone = reinterpret_cast<RubyTone*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"(%hhu, %hhu, %hhu, %hhu)\n",
+				static_cast<uint8_t>(pRubyTone->Red),
+				static_cast<uint8_t>(pRubyTone->Green),
+				static_cast<uint8_t>(pRubyTone->Blue),
+				static_cast<uint8_t>(pRubyTone->Gray)
 			);
 		}
 		
