@@ -81,7 +81,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		//L"marshals/marshal/testset_instance.rxdata",
 		//L"marshals/marshal/game_system_instance.rxdata",
 		//L"marshals/Data/Actors.rxdata", // ok
-		L"marshals/Data/Animations.rxdata",
+		//L"marshals/Data/Animations.rxdata", // ok
 		//L"marshals/Data/Armors.rxdata", // ok
 		//L"marshals/Data/Classes.rxdata", // ok
 		//L"marshals/Data/CommonEvents.rxdata", // ok
@@ -96,6 +96,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		//L"marshals/Data/Tilesets.rxdata", // ok
 		//L"marshals/Data/Troops.rxdata", // ok
 		//L"marshals/Data/Weapons.rxdata", // ok
+		L"marshals/Save1.rxdata", // ok
 	};
 
 	rootObjectPtrs.reserve(10000);
@@ -786,6 +787,24 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 				wprintf(L"  ");
 			}
 			wprintf(L"- ElementCount = %u\n", pRubyTable->ElementCount);
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"- Elements =\n");
+			for (uint32_t z = 0; z < pRubyTable->SizeZ; ++z)
+			{
+				for (uint32_t y = 0; y < pRubyTable->SizeY; ++y)
+				{
+					for (uint32_t x = 0; x < pRubyTable->SizeX; ++x)
+					{
+						int16_t element = pRubyTable->Elements[x + y * pRubyTable->SizeX + z * pRubyTable->SizeX * pRubyTable->SizeY];
+						wprintf(L"%5hd ", element);
+					}
+					wprintf(L"\n");
+				}
+			}
 		}
 		else if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Color", 5) == 0)
 		{
