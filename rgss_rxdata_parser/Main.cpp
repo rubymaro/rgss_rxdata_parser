@@ -22,6 +22,7 @@
 #include "RubyObject.h"
 #include "RubyUserDefined.h"
 #include "RubyTable.h"
+#include "RubyColor.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, unsigned char** ppOutData, unsigned int* pDataSize);
 bool StartParse(unsigned char* const paBuf, const unsigned int bufSize, std::vector<RubyBase*>& currentObjectPtrs);
@@ -598,19 +599,20 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			ProcessFixnum(ppToken, &val);
 
 			RubySymbol* pRubyUserDefinedSymbol = RubySymbol::sSymbolLinks[val];
-			if (pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Table", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
+			if ((pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Table", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
+				|| (pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Color", pRubyUserDefinedSymbol->SymbolNameLength) == 0))
 			{
 				char* paDataBuffer;
 
 				ProcessFixnum(ppToken, &val);
 				paDataBuffer = static_cast<char*>(malloc(val));
+				assert(paDataBuffer != nullptr);
 				memcpy(paDataBuffer, *ppToken, val);
 
 				currentObjectPtrs.push_back(new RubyUserDefined((char*)pRubyUserDefinedSymbol->PAPtr, pRubyUserDefinedSymbol->SymbolNameLength, paDataBuffer, val));
 
 				*ppToken += val;
 			}
-			
 		}
 		else
 		{
@@ -619,12 +621,13 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			paRubySymbol = new RubySymbol(paBuffer, bufferLength);
 			RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 
-			if (memcmp(paBuffer, "Table", bufferLength) == 0)
+			if ((bufferLength == 5 && memcmp(paBuffer, "Table", bufferLength) == 0)
+				|| (bufferLength == 5 && memcmp(paBuffer, "Color", bufferLength) == 0))
 			{
 				char* paDataBuffer;
-
 				ProcessFixnum(ppToken, &val);
 				paDataBuffer = static_cast<char*>(malloc(val));
+				assert(paDataBuffer != nullptr);
 				memcpy(paDataBuffer, *ppToken, val);
 
 				RubyBase* paRubyUserDefined = new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, val);
@@ -708,8 +711,6 @@ const wchar_t* RubyTokenToString(const eRubyTokens token)
 
 void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 {
-	RubyTable* pRubyTable;
-
 	for (int i = 0; i < indent; ++i)
 	{
 		wprintf(L"  ");
@@ -750,38 +751,59 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		wprintf(L"User-defined class ");
 		fwrite(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, sizeof(char), static_cast<const RubyUserDefined*>(pRubyBase)->ClassNameLength, stdout);
 		wprintf(L"\n");
-		pRubyTable = reinterpret_cast<RubyTable*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
+
+		if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Table", 5) == 0)
+		{
+			RubyTable* pRubyTable;
+
+			pRubyTable = reinterpret_cast<RubyTable*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"- Dimension = %u\n", pRubyTable->Dimension);
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"- SizeX = %u\n", pRubyTable->SizeX);
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"- SizeY = %u\n", pRubyTable->SizeY);
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"- SizeZ = %u\n", pRubyTable->SizeZ);
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"- ElementCount = %u\n", pRubyTable->ElementCount);
+		}
+		else if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Color", 5) == 0)
+		{
+			RubyColor* pRubyColor;
+			pRubyColor = reinterpret_cast<RubyColor*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
+
+			for (int i = 0; i < indent; ++i)
+			{
+				wprintf(L"  ");
+			}
+			wprintf(L"(%hhu, %hhu, %hhu, %hhu)\n",
+				static_cast<uint8_t>(pRubyColor->Red),
+				static_cast<uint8_t>(pRubyColor->Green),
+				static_cast<uint8_t>(pRubyColor->Blue),
+				static_cast<uint8_t>(pRubyColor->Alpha)
+			);
+		}
 		
-		for (int i = 0; i < indent; ++i)
-		{
-			wprintf(L"  ");
-		}
-		wprintf(L"- Dimension = %u\n", pRubyTable->Dimension);
-
-		for (int i = 0; i < indent; ++i)
-		{
-			wprintf(L"  ");
-		}
-		wprintf(L"- SizeX = %u\n", pRubyTable->SizeX);
-
-		for (int i = 0; i < indent; ++i)
-		{
-			wprintf(L"  ");
-		}
-		wprintf(L"- SizeY = %u\n", pRubyTable->SizeY);
-
-		for (int i = 0; i < indent; ++i)
-		{
-			wprintf(L"  ");
-		}
-		wprintf(L"- SizeZ = %u\n", pRubyTable->SizeZ);
-
-		for (int i = 0; i < indent; ++i)
-		{
-			wprintf(L"  ");
-		}
-		wprintf(L"- ElementCount = %u\n", pRubyTable->ElementCount);
-
 		break;
 	case eRubyTokens::TYPE_USRMARSHAL:
 		assert(0);

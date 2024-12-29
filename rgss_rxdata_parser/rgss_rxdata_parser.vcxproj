@@ -132,6 +132,7 @@
     <ClCompile Include="RubyArray.cpp" />
     <ClCompile Include="RubyBignum.cpp" />
     <ClCompile Include="RubyClass.cpp" />
+    <ClCompile Include="RubyColor.h" />
     <ClCompile Include="RubyFalse.cpp" />
     <ClCompile Include="RubyFixnum.cpp" />
     <ClCompile Include="RubyFloat.cpp" />

@@ -64,6 +64,9 @@
     <ClCompile Include="RubyUserDefined.cpp">
       <Filter>RubyUserDefined</Filter>
     </ClCompile>
+    <ClCompile Include="RubyColor.h">
+      <Filter>RubyUserDefined</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RubyArray.h">
