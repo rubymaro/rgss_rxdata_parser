@@ -106,7 +106,7 @@ int wmain(const int argc, const wchar_t* argv[])
 
 	for (const wchar_t* pFileName : ppFileNames)
 	{
-		wprintf(L"Start reading \"%s\"\n", pFileName);
+		wprintf(L"Start reading \"%s\"=============================\n", pFileName);
 		if (ReadBytes(pFileName, &paBuf, &bufSize))
 		{
 			pToken = paBuf;
@@ -147,7 +147,7 @@ int wmain(const int argc, const wchar_t* argv[])
 		{
 			assert(0);
 		}
-		wprintf(L"----------------------------------\n\n");
+		wprintf(L"=====================================================\n\n");
 	}
 
 	return 0;
@@ -864,6 +864,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_FLOAT:
+		wprintf(L"%.1lf\n", static_cast<const RubyFloat*>(pRubyBase)->Value);
 		break;
 	case eRubyTokens::TYPE_BIGNUM:
 		break;

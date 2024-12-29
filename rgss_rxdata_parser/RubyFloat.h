@@ -20,5 +20,6 @@ struct RubyFloat : public RubyBase
 
 	size_t ByteCount;
 	eStates State;
+	double Value;
 };
 
