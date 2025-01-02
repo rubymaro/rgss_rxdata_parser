@@ -7,3 +7,8 @@ RubySymbol::RubySymbol(const char* const pSymbolName, const size_t symbolNameLen
 	, Name(pSymbolName, symbolNameLength)
 {
 }
+
+RubySymbol::RubySymbol(const RubySymbol& other)
+	: RubySymbol(other.Name.c_str(), other.Name.size())
+{
+}

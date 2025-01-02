@@ -515,7 +515,7 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 	case eRubyTokens::TYPE_SYMLINK:
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
-		currentObjectPtrs.push_back(RubySymbol::sSymbolLinks[val]);
+		currentObjectPtrs.push_back(new RubySymbol(*RubySymbol::sSymbolLinks[val]));
 		break;
 
 	case eRubyTokens::TYPE_STRUCT:
