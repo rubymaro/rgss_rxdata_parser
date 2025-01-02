@@ -1,6 +1,6 @@
 #include "RubyBignum.h"
 
-RubyBignum::RubyBignum(bool bSign, char* bytes, const size_t byteLength)
+RubyBignum::RubyBignum(const bool bSign, char* const bytes, const size_t byteLength)
 	: RubyBase(eRubyTokens::TYPE_BIGNUM)
 	, Sign(bSign)
 	, PABytes(bytes)

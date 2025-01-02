@@ -4,7 +4,7 @@
 
 struct RubyClass : public RubyBase
 {
-	RubyClass(char* const paClassName, const size_t classNameLength);
+	RubyClass(const char* const pClassName, const size_t classNameLength);
 
 	std::string Name;
 };
