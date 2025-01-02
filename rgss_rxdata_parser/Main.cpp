@@ -26,7 +26,7 @@
 #include "RubyTone.h"
 
 bool ReadBytes(const wchar_t* const pWcsfileName, uint8_t** ppOutData, uint32_t* pDataSize);
-int64_t StartParse(uint8_t** ppaToken, const uint8_t* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
+int64_t StartParse(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ProcessFixnum(uint8_t** ppToken, int32_t* pOutVal);
 RubyString* ProcessStringUTF8(uint8_t** ppToken);
