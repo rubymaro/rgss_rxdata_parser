@@ -1,13 +1,12 @@
 #include "RubyBignum.h"
 
-RubyBignum::RubyBignum(const bool bSign, char* const bytes, const size_t byteLength)
+RubyBignum::RubyBignum(const bool bSign, const char* const pSrcBytes, const size_t byteLength)
 	: RubyBase(eRubyTokens::TYPE_BIGNUM)
 	, Sign(bSign)
-	, PABytes(bytes)
 	, ByteLength(byteLength)
 {
 	PABytes = new char[byteLength];
-	memcpy(PABytes, bytes, byteLength);
+	memcpy(PABytes, pSrcBytes, byteLength);
 
 	sObjectReferences.push_back(this);
 }

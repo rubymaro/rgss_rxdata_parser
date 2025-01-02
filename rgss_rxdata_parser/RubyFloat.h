@@ -16,7 +16,7 @@ struct RubyFloat : public RubyBase
 		SignedInfinity = 3
 	};
 
-	RubyFloat(char* const paBytes, const size_t byteCount);
+	RubyFloat(const char* const pSrcBytes, const size_t byteCount);
 
 	eStates State;
 	double Value;
