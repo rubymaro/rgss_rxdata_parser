@@ -441,14 +441,12 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		++(*ppToken);
 		pRubyBase = ProcessStringUTF8(ppToken);
 		assert(pRubyBase != nullptr);
-
 		currentObjectPtrs.push_back(pRubyBase);
 		break;
 
 	case eRubyTokens::TYPE_ARRAY:
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
-
 		pRubyBase = new RubyArray(val);
 		currentObjectPtrs.push_back(pRubyBase);
 		for (repCount = 0; repCount < val; ++repCount)
@@ -489,7 +487,6 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 	case eRubyTokens::TYPE_FLOAT:
 		++(*ppToken);
-
 		ProcessFixnum(ppToken, &val);
 		currentObjectPtrs.push_back(new RubyFloat(reinterpret_cast<char*>(*ppToken), val));
 		(*ppToken) += val;
@@ -497,7 +494,6 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 	case eRubyTokens::TYPE_CLASS: // Struct, Class Declaration
 		++(*ppToken);
-
 		ProcessFixnum(ppToken, &val);
 		currentObjectPtrs.push_back(new RubyClass(reinterpret_cast<char*>(*ppToken), val));
 		(*ppToken) += val;
@@ -507,7 +503,6 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		++(*ppToken);
 		paRubySymbol = ProcessSymbol(ppToken);
 		assert(paRubySymbol != nullptr);
-
 		currentObjectPtrs.push_back(paRubySymbol);
 		RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 		break;
