@@ -5,5 +5,6 @@
 struct RubyFixnum : public RubyBase
 {
 	RubyFixnum(const int32_t val);
+	int32_t Value;
 };
 

@@ -7,10 +7,9 @@
 
 struct RubyBase
 {
-	RubyBase(const eRubyTokens type, void* paPtr);
+	RubyBase(const eRubyTokens type);
 
 	eRubyTokens Type;
-	void* PAPtr;
 
 	static std::vector<RubyBase*> sObjectReferences;
 };

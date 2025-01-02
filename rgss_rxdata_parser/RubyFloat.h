@@ -18,7 +18,6 @@ struct RubyFloat : public RubyBase
 
 	RubyFloat(char* const paBytes, const size_t byteCount);
 
-	size_t ByteCount;
 	eStates State;
 	double Value;
 };

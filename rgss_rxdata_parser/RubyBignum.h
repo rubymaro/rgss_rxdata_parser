@@ -4,9 +4,10 @@
 
 struct RubyBignum : public RubyBase
 {
-	RubyBignum(bool bSign, const size_t byteLength, char* bytes);
+	RubyBignum(bool bSign, char* bytes, const size_t byteLength);
 
 	bool Sign;
+	char* PABytes;
 	size_t ByteLength;
 };
 

@@ -7,6 +7,8 @@ struct RubyUserDefined : public RubyBase
 	RubyUserDefined(const char* paClassName, const size_t classNameLength, char* const paPtr, const size_t bufferLength);
 
 	std::string ClassName;
+
+	char* PABuffer;
 	size_t BufferLength;
 };
 

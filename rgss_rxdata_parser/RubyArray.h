@@ -6,8 +6,9 @@
 
 struct RubyArray : public RubyBase
 {
-	RubyArray(std::vector<RubyBase*>* const paPtrs, const size_t length);
+	RubyArray(const size_t length);
 
+	std::vector<RubyBase*> ArrayElementPtrs;
 	size_t Length;
 };
 

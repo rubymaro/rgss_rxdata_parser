@@ -2,8 +2,7 @@
 
 std::vector<RubyBase*> RubyBase::sObjectReferences(1);
 
-RubyBase::RubyBase(const eRubyTokens type, void* paPtr)
+RubyBase::RubyBase(const eRubyTokens type)
 	: Type(type)
-	, PAPtr(paPtr)
 {
 }

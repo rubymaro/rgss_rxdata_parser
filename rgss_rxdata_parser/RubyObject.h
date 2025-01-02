@@ -4,9 +4,9 @@
 
 struct RubyObject : public RubyBase
 {
-	RubyObject(const char* paClassName, const size_t classNameLength, std::vector<RubyBase*>* const paPtrs, const size_t length, const bool bAddToRef);
+	RubyObject(const char* paClassName, const size_t classNameLength, const bool bAddToRef);
 
 	std::string ClassName;
-	size_t ChildLength;
+	std::vector<RubyBase*> ObjectElementPtrs;
 };
 

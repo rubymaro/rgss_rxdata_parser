@@ -1,6 +1,6 @@
 #include "RubyFalse.h"
 
 RubyFalse::RubyFalse(void)
-	: RubyBase(eRubyTokens::TYPE_FALSE, nullptr)
+	: RubyBase(eRubyTokens::TYPE_FALSE)
 {
 }

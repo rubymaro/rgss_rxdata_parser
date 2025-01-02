@@ -1,6 +1,6 @@
 #include "RubyNil.h"
 
 RubyNil::RubyNil(void)
-	: RubyBase(eRubyTokens::TYPE_NIL, nullptr)
+	: RubyBase(eRubyTokens::TYPE_NIL)
 {
 }
