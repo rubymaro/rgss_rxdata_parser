@@ -1,8 +1,8 @@
 #include "RubyArray.h"
 
-RubyArray::RubyArray(const size_t length)
+RubyArray::RubyArray(const size_t capacity)
 	: RubyBase(eRubyTokens::TYPE_ARRAY)
-	, Length(length)
 {
+	ArrayElementPtrs.reserve(capacity);
 	sObjectReferences.push_back(this);
 }

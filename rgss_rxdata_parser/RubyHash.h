@@ -6,9 +6,8 @@
 
 struct RubyHash : public RubyBase
 {
-	RubyHash(const size_t pairCount);
+	RubyHash(const size_t capacity);
 
 	std::vector<RubyBase*> HashElementPtrs;
-	size_t PairCount;
 };
 

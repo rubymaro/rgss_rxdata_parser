@@ -1,12 +1,10 @@
 #include "RubyObject.h"
 #include "RubyClass.h"
 
-RubyObject::RubyObject(const char* paClassName, const size_t classNameLength, const bool bAddToRef)
+RubyObject::RubyObject(const char* const pClassName, const size_t classNameLength, const size_t capacity)
 	: RubyBase(eRubyTokens::TYPE_OBJECT)
-	, ClassName(paClassName, classNameLength)
+	, ClassName(pClassName, classNameLength)
 {
-	if (bAddToRef)
-	{
-		sObjectReferences.push_back(this);
-	}
+	ObjectElementPtrs.reserve(capacity);
+	sObjectReferences.push_back(this);
 }

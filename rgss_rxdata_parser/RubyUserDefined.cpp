@@ -1,8 +1,8 @@
 #include "RubyUserDefined.h"
 
-RubyUserDefined::RubyUserDefined(const char* paClassName, const size_t classNameLength, char* const paPtr, const size_t bufferLength)
+RubyUserDefined::RubyUserDefined(const char* const pClassName, const size_t classNameLength, char* const paPtr, const size_t bufferLength)
 	: RubyBase(eRubyTokens::TYPE_USERDEF)
-	, ClassName(paClassName, classNameLength)
+	, ClassName(pClassName, classNameLength)
 	, PABuffer(paPtr)
 	, BufferLength(bufferLength)
 {

@@ -6,7 +6,7 @@
 
 struct RubySymbol : public RubyBase
 {
-	RubySymbol(char* const paSymbolName, const size_t symbolNameLength);
+	RubySymbol(const char* const pSymbolName, const size_t symbolNameLength);
 
 	std::string Name;
 

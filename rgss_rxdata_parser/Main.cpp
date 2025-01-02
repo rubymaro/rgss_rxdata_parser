@@ -457,7 +457,6 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
 		pRubyBase = new RubyArray(val);
-		static_cast<RubyArray*>(pRubyBase)->ArrayElementPtrs.reserve(val);
 		currentObjectPtrs.push_back(pRubyBase);
 		for (repCount = 0; repCount < val; ++repCount)
 		{
@@ -473,7 +472,6 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		ProcessFixnum(ppToken, &val);
 		val = val * 2 + hashDefault; // <key, value> + default value
 		pRubyBase = new RubyHash(val);
-		static_cast<RubyHash*>(pRubyBase)->HashElementPtrs.reserve(val);
 		currentObjectPtrs.push_back(pRubyBase);
 		for (repCount = 0; repCount < val; ++repCount)
 		{
@@ -547,8 +545,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 		ProcessFixnum(ppToken, &val);
 		val *= 2;
 
-		pRubyBase = new RubyStruct(paBuffer, bufferLength);
-		static_cast<RubyStruct*>(pRubyBase)->StructMemberPtrs.reserve(val);
+		pRubyBase = new RubyStruct(paBuffer, bufferLength, val);
 		currentObjectPtrs.push_back(pRubyBase);
 
 		for (repCount = 0; repCount < val; ++repCount)
@@ -567,8 +564,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			ProcessFixnum(ppToken, &val);
 			val *= 2;
 
-			pRubyBase = new RubyObject(paBuffer, bufferLength, true);
-			static_cast<RubyObject*>(pRubyBase)->ObjectElementPtrs.reserve(val);
+			pRubyBase = new RubyObject(paBuffer, bufferLength, val);
 			currentObjectPtrs.push_back(pRubyBase);
 			RubySymbol::sSymbolLinks.push_back(new RubySymbol(paBuffer, bufferLength));
 
@@ -587,8 +583,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			ProcessFixnum(ppToken, &val); // member count
 			val *= 2;
 
-			pRubyBase = new RubyObject(pLinkedSymbol->Name.c_str(), pLinkedSymbol->Name.size(), true);
-			static_cast<RubyObject*>(pRubyBase)->ObjectElementPtrs.reserve(val);
+			pRubyBase = new RubyObject(pLinkedSymbol->Name.c_str(), pLinkedSymbol->Name.size(), val);
 			currentObjectPtrs.push_back(pRubyBase);
 
 			for (repCount = 0; repCount < val; ++repCount)

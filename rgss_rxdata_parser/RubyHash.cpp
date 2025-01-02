@@ -1,8 +1,8 @@
 #include "RubyHash.h"
 
-RubyHash::RubyHash(const size_t pairCount)
+RubyHash::RubyHash(const size_t capacity)
 	: RubyBase(eRubyTokens::TYPE_HASH)
-	, PairCount(pairCount)
 {
+	HashElementPtrs.reserve(capacity);
 	sObjectReferences.push_back(this);
 }
