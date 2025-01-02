@@ -7,3 +7,11 @@ RubyStruct::RubyStruct(const char* const pStructName, const size_t structNameLen
 	StructMemberPtrs.reserve(capacity);
 	sObjectReferences.push_back(this);
 }
+
+RubyStruct::~RubyStruct(void)
+{
+	for (RubyBase* pRubyBase : StructMemberPtrs)
+	{
+		delete pRubyBase;
+	}
+}

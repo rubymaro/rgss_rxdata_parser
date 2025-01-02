@@ -8,3 +8,11 @@ RubyObject::RubyObject(const char* const pClassName, const size_t classNameLengt
 	ObjectElementPtrs.reserve(capacity);
 	sObjectReferences.push_back(this);
 }
+
+RubyObject::~RubyObject(void)
+{
+	for (RubyBase* pRubyBase : ObjectElementPtrs)
+	{
+		delete pRubyBase;
+	}
+}

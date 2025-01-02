@@ -6,3 +6,11 @@ RubyArray::RubyArray(const size_t capacity)
 	ArrayElementPtrs.reserve(capacity);
 	sObjectReferences.push_back(this);
 }
+
+RubyArray::~RubyArray(void)
+{
+	for (RubyBase* pRubyBase : ArrayElementPtrs)
+	{
+		delete pRubyBase;
+	}
+}

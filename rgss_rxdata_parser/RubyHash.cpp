@@ -6,3 +6,11 @@ RubyHash::RubyHash(const size_t capacity)
 	HashElementPtrs.reserve(capacity);
 	sObjectReferences.push_back(this);
 }
+
+RubyHash::~RubyHash(void)
+{
+	for (RubyBase* pRubyBase : HashElementPtrs)
+	{
+		delete pRubyBase;
+	}
+}
