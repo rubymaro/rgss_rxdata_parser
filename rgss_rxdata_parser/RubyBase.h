@@ -8,6 +8,7 @@
 struct RubyBase
 {
 	RubyBase(const eRubyTokens type);
+	virtual ~RubyBase(void) = default;
 
 	eRubyTokens Type;
 

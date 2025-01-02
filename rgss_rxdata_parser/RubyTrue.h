@@ -5,5 +5,6 @@
 struct RubyTrue : public RubyBase
 {
 	RubyTrue(void);
+	virtual ~RubyTrue(void) = default;
 };
 

@@ -17,6 +17,7 @@ struct RubyFloat : public RubyBase
 	};
 
 	RubyFloat(const char* const pSrcBytes, const size_t byteCount);
+	virtual ~RubyFloat(void) = default;
 
 	eStates State;
 	double Value;

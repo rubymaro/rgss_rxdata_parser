@@ -7,6 +7,7 @@
 struct RubySymbol : public RubyBase
 {
 	RubySymbol(const char* const pSymbolName, const size_t symbolNameLength);
+	virtual ~RubySymbol(void) = default;
 
 	std::string Name;
 

@@ -171,7 +171,7 @@ bool ReadBytes(const wchar_t* const pWcsfileName, uint8_t** ppOutData, uint32_t*
 		}
 
 		fseek(pFile, 0, SEEK_END);
-		bufSize = (uint32_t)ftell(pFile);
+		bufSize = static_cast<uint32_t>(ftell(pFile));
 		fseek(pFile, 0, SEEK_SET);
 
 		if (bufSize < 2)
@@ -180,7 +180,7 @@ bool ReadBytes(const wchar_t* const pWcsfileName, uint8_t** ppOutData, uint32_t*
 		}
 
 		paBuf = new uint8_t[bufSize];
-		readByte = (uint32_t)fread_s(paBuf, bufSize, sizeof(uint8_t), bufSize, pFile);
+		readByte = static_cast<uint32_t>(fread_s(paBuf, bufSize, sizeof(uint8_t), bufSize, pFile));
 
 		bSuccess = true;
 
