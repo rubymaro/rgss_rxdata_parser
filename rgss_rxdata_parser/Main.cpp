@@ -418,17 +418,17 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 	{
 	case eRubyTokens::TYPE_NIL:
 		++(*ppToken);
-		currentObjectPtrs.push_back(new RubyNil);
+		currentObjectPtrs.push_back(new RubyNil());
 		break;
 
 	case eRubyTokens::TYPE_TRUE:
 		++(*ppToken);
-		currentObjectPtrs.push_back(new RubyTrue);
+		currentObjectPtrs.push_back(new RubyTrue());
 		break;
 
 	case eRubyTokens::TYPE_FALSE:
 		++(*ppToken);
-		currentObjectPtrs.push_back(new RubyFalse);
+		currentObjectPtrs.push_back(new RubyFalse());
 		break;
 
 	case eRubyTokens::TYPE_FIXNUM:
@@ -441,12 +441,14 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		++(*ppToken);
 		pRubyBase = ProcessStringUTF8(ppToken);
 		assert(pRubyBase != nullptr);
+
 		currentObjectPtrs.push_back(pRubyBase);
 		break;
 
 	case eRubyTokens::TYPE_ARRAY:
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
+
 		pRubyBase = new RubyArray(val);
 		currentObjectPtrs.push_back(pRubyBase);
 		for (repCount = 0; repCount < val; ++repCount)
@@ -482,7 +484,6 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		val *= 2;
 
 		currentObjectPtrs.push_back(new RubyBignum(bSignBignum, reinterpret_cast<char*>(*ppToken), val));
-
 		(*ppToken) += val;
 		break;
 
@@ -491,7 +492,6 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 		ProcessFixnum(ppToken, &val);
 		currentObjectPtrs.push_back(new RubyFloat(reinterpret_cast<char*>(*ppToken), val));
-
 		(*ppToken) += val;
 		break;
 
@@ -499,16 +499,15 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		++(*ppToken);
 
 		ProcessFixnum(ppToken, &val);
-
 		currentObjectPtrs.push_back(new RubyClass(reinterpret_cast<char*>(*ppToken), val));
 		(*ppToken) += val;
-
 		break;
 
 	case eRubyTokens::TYPE_SYMBOL:
 		++(*ppToken);
 		paRubySymbol = ProcessSymbol(ppToken);
 		assert(paRubySymbol != nullptr);
+
 		currentObjectPtrs.push_back(paRubySymbol);
 		RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 		break;
@@ -602,19 +601,10 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 			ProcessFixnum(ppToken, &val);
 
 			RubySymbol* pRubyUserDefinedSymbol = RubySymbol::sSymbolLinks[val];
-			if (pRubyUserDefinedSymbol->Name == "Table"
-				|| pRubyUserDefinedSymbol->Name == "Color"
-				|| pRubyUserDefinedSymbol->Name == "Tone")
+			if (pRubyUserDefinedSymbol->Name == "Table" || pRubyUserDefinedSymbol->Name == "Color" || pRubyUserDefinedSymbol->Name == "Tone")
 			{
-				char* paDataBuffer;
-
 				ProcessFixnum(ppToken, &val);
-				paDataBuffer = static_cast<char*>(malloc(val));
-				assert(paDataBuffer != nullptr);
-				memcpy(paDataBuffer, *ppToken, val);
-
-				currentObjectPtrs.push_back(new RubyUserDefined(pRubyUserDefinedSymbol->Name.c_str(), pRubyUserDefinedSymbol->Name.size(), paDataBuffer, val));
-
+				currentObjectPtrs.push_back(new RubyUserDefined(pRubyUserDefinedSymbol->Name.c_str(), pRubyUserDefinedSymbol->Name.size(), reinterpret_cast<char*>(*ppToken), val));
 				*ppToken += val;
 			}
 		}
@@ -627,22 +617,15 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 			RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 
-			if (paRubySymbol->Name == "Table"
-				|| paRubySymbol->Name == "Color"
-				|| paRubySymbol->Name == "Tone")
+			if (paRubySymbol->Name == "Table" || paRubySymbol->Name == "Color" || paRubySymbol->Name == "Tone")
 			{
-				char* paDataBuffer;
 				ProcessFixnum(ppToken, &val);
-				paDataBuffer = static_cast<char*>(malloc(val));
-				assert(paDataBuffer != nullptr);
-				memcpy(paDataBuffer, *ppToken, val);
 
-				RubyBase* paRubyUserDefined = new RubyUserDefined(paRubySymbol->Name.c_str(), paRubySymbol->Name.size(), paDataBuffer, val);
-
-				currentObjectPtrs.push_back(paRubyUserDefined);
-				RubyObject::sObjectReferences.push_back(paRubyUserDefined);
-
+				pRubyBase = new RubyUserDefined(paRubySymbol->Name.c_str(), paRubySymbol->Name.size(), reinterpret_cast<char*>(*ppToken), val);
 				*ppToken += val;
+
+				currentObjectPtrs.push_back(pRubyBase);
+				RubyObject::sObjectReferences.push_back(pRubyBase);
 			}
 		}
 
