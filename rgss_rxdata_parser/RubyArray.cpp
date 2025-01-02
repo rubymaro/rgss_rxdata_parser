@@ -13,4 +13,5 @@ RubyArray::~RubyArray(void)
 	{
 		delete pRubyBase;
 	}
+	ArrayElementPtrs.clear();
 }

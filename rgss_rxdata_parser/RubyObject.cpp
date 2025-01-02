@@ -15,4 +15,5 @@ RubyObject::~RubyObject(void)
 	{
 		delete pRubyBase;
 	}
+	ObjectElementPtrs.clear();
 }

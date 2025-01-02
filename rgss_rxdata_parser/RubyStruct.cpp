@@ -14,4 +14,5 @@ RubyStruct::~RubyStruct(void)
 	{
 		delete pRubyBase;
 	}
+	StructMemberPtrs.clear();
 }

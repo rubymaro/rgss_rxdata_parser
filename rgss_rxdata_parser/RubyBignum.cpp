@@ -14,4 +14,5 @@ RubyBignum::RubyBignum(const bool bSign, const char* const pSrcBytes, const size
 RubyBignum::~RubyBignum(void)
 {
 	delete[] PABytes;
+	PABytes = nullptr;
 }

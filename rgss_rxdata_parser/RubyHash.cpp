@@ -13,4 +13,5 @@ RubyHash::~RubyHash(void)
 	{
 		delete pRubyBase;
 	}
+	HashElementPtrs.clear();
 }

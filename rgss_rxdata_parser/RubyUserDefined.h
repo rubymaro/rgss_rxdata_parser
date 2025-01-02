@@ -5,7 +5,7 @@
 struct RubyUserDefined : public RubyBase
 {
 	RubyUserDefined(const char* const pClassName, const size_t classNameLength, const char* const pSrcBuffer, const size_t bufferLength);
-	~RubyUserDefined(void);
+	virtual ~RubyUserDefined(void) override;
 
 	std::string ClassName;
 	char* PABuffer;

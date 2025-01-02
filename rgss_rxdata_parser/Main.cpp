@@ -112,7 +112,6 @@ int32_t wmain(const int32_t argc, const wchar_t* argv[])
 			pToken = paBuf;
 			while (true)
 			{
-				rootObjectPtrs.clear();
 				RubyObject::sObjectReferences.clear();
 				RubyObject::sObjectReferences.push_back(nullptr);
 				RubySymbol::sSymbolLinks.clear();
@@ -123,6 +122,12 @@ int32_t wmain(const int32_t argc, const wchar_t* argv[])
 					PrintRxdataRecursive(pRubyBase, 0);
 				}
 				wprintf(L"-----------------------------------------------------------------------\n");
+
+				for (RubyBase* pRubyBase : rootObjectPtrs)
+				{
+					delete pRubyBase;
+				}
+				rootObjectPtrs.clear();
 
 				if (ret < 0)
 				{
