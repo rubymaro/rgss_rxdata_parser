@@ -28,9 +28,9 @@
 bool ReadBytes(const wchar_t* const pWcsfileName, uint8_t** ppOutData, uint32_t* pDataSize);
 int64_t StartParse(uint8_t** ppaToken, const uint8_t* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
 bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<RubyBase*>& currentObjectPtrs);
-bool ProcessFixnum(uint8_t** ppToken, int32_t* outVal);
-bool ProcessStringUTF8(uint8_t** ppToken, char** ppaString, size_t* pOutLength);
-bool ProcessSymbol(uint8_t** ppToken, char** ppaSymbol, size_t* pOutLength);
+bool ProcessFixnum(uint8_t** ppToken, int32_t* pOutVal);
+RubyString* ProcessStringUTF8(uint8_t** ppToken);
+RubySymbol* ProcessSymbol(uint8_t** ppToken);
 const wchar_t* RubyTokenToString(const eRubyTokens token);
 void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int32_t indent);
 
@@ -219,7 +219,7 @@ int64_t StartParse(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Rub
 	return pEnd - *ppToken;
 }
 
-bool ProcessFixnum(uint8_t** ppToken, int32_t* outVal)
+bool ProcessFixnum(uint8_t** ppToken, int32_t* pOutVal)
 {
 	const int32_t fixnumHeader = (*ppToken)[0];
 	int32_t retFixnum = -1;
@@ -294,19 +294,18 @@ bool ProcessFixnum(uint8_t** ppToken, int32_t* outVal)
 		break;
 	}
 
-	*outVal = retFixnum;
+	*pOutVal = retFixnum;
 
 	return true;
 }
 
-bool ProcessStringUTF8(uint8_t** ppToken, char** ppaString, size_t* pOutLength)
+RubyString* ProcessStringUTF8(uint8_t** ppToken)
 {
 	assert(ppToken != nullptr);
-	assert(ppaString != nullptr);
-	assert(pOutLength != nullptr);
 
 	const int32_t stringLengthHeader = (*ppToken)[0];
 	size_t utf8ByteLength = 0;
+	RubyString* paRubyString;
 
 	switch (stringLengthHeader)
 	{
@@ -343,27 +342,23 @@ bool ProcessStringUTF8(uint8_t** ppToken, char** ppaString, size_t* pOutLength)
 		}
 		else
 		{
-			return false;
+			return nullptr;
 		}
 	}
 
-	*ppaString = new char[utf8ByteLength];
-	memcpy(*ppaString, reinterpret_cast<const char*>(*ppToken), utf8ByteLength);
-	*pOutLength = utf8ByteLength;
-
+	paRubyString = new RubyString(reinterpret_cast<char*>(*ppToken), utf8ByteLength);
 	(*ppToken) += utf8ByteLength;
 
-	return true;
+	return paRubyString;
 }
 
-bool ProcessSymbol(uint8_t** ppToken, char** ppaSymbol, size_t* pOutLength)
+RubySymbol* ProcessSymbol(uint8_t** ppToken)
 {
 	assert(ppToken != nullptr);
-	assert(ppaSymbol != nullptr);
-	assert(pOutLength != nullptr);
 
 	const int32_t symbolLengthHeader = (*ppToken)[0];
 	size_t symbolLength = 0;
+	RubySymbol* paRubySymbol;
 
 	switch (symbolLengthHeader)
 	{
@@ -400,25 +395,20 @@ bool ProcessSymbol(uint8_t** ppToken, char** ppaSymbol, size_t* pOutLength)
 		}
 		else
 		{
-			return false;
+			return nullptr;
 		}
 	}
 
-	*ppaSymbol = new char[symbolLength];
-	memcpy(*ppaSymbol, reinterpret_cast<const char*>(*ppToken), symbolLength);
-	*pOutLength = symbolLength;
-
+	paRubySymbol = new RubySymbol(reinterpret_cast<const char*>(*ppToken), symbolLength);
 	(*ppToken) += symbolLength;
 
-	return true;
+	return paRubySymbol;
 }
 
 bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<RubyBase*>& currentObjectPtrs)
 {
 	int32_t val;
 	int32_t repCount;
-	char* paBuffer;
-	size_t bufferLength;
 	bool bSignBignum;
 	int32_t hashDefault = 0;
 	RubySymbol* paRubySymbol;
@@ -449,8 +439,9 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 	case eRubyTokens::TYPE_STRING:
 		++(*ppToken);
-		ProcessStringUTF8(ppToken, &paBuffer, &bufferLength);
-		currentObjectPtrs.push_back(new RubyString(paBuffer, bufferLength));
+		pRubyBase = ProcessStringUTF8(ppToken);
+		assert(pRubyBase != nullptr);
+		currentObjectPtrs.push_back(pRubyBase);
 		break;
 
 	case eRubyTokens::TYPE_ARRAY:
@@ -490,9 +481,7 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		ProcessFixnum(ppToken, &val);
 		val *= 2;
 
-		paBuffer = new char[val];
-		memcpy(paBuffer, *ppToken, val);
-		currentObjectPtrs.push_back(new RubyBignum(bSignBignum, paBuffer, val));
+		currentObjectPtrs.push_back(new RubyBignum(bSignBignum, reinterpret_cast<char*>(*ppToken), val));
 
 		(*ppToken) += val;
 		break;
@@ -501,10 +490,7 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		++(*ppToken);
 
 		ProcessFixnum(ppToken, &val);
-
-		paBuffer = new char[val];
-		memcpy(paBuffer, *ppToken, val);
-		currentObjectPtrs.push_back(new RubyFloat(paBuffer, val));
+		currentObjectPtrs.push_back(new RubyFloat(reinterpret_cast<char*>(*ppToken), val));
 
 		(*ppToken) += val;
 		break;
@@ -514,17 +500,15 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 		ProcessFixnum(ppToken, &val);
 
-		paBuffer = new char[val];
-		memcpy(paBuffer, *ppToken, val);
-		currentObjectPtrs.push_back(new RubyClass(paBuffer, val));
+		currentObjectPtrs.push_back(new RubyClass(reinterpret_cast<char*>(*ppToken), val));
 		(*ppToken) += val;
 
 		break;
 
 	case eRubyTokens::TYPE_SYMBOL:
 		++(*ppToken);
-		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
-		paRubySymbol = new RubySymbol(paBuffer, bufferLength);
+		paRubySymbol = ProcessSymbol(ppToken);
+		assert(paRubySymbol != nullptr);
 		currentObjectPtrs.push_back(paRubySymbol);
 		RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 		break;
@@ -540,12 +524,14 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 
 		assert(**ppToken == ':');
 		++(*ppToken);
-		ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+
+		paRubySymbol = ProcessSymbol(ppToken);
+		assert(paRubySymbol != nullptr);
 
 		ProcessFixnum(ppToken, &val);
 		val *= 2;
 
-		pRubyBase = new RubyStruct(paBuffer, bufferLength, val);
+		pRubyBase = new RubyStruct(paRubySymbol->Name.c_str(), paRubySymbol->Name.size(), val);
 		currentObjectPtrs.push_back(pRubyBase);
 
 		for (repCount = 0; repCount < val; ++repCount)
@@ -560,13 +546,15 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		if (**ppToken == ':')
 		{
 			++(*ppToken);
-			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
+			paRubySymbol = ProcessSymbol(ppToken);
+			assert(paRubySymbol != nullptr);
+
 			ProcessFixnum(ppToken, &val);
 			val *= 2;
 
-			pRubyBase = new RubyObject(paBuffer, bufferLength, val);
+			pRubyBase = new RubyObject(paRubySymbol->Name.c_str(), paRubySymbol->Name.size(), val);
 			currentObjectPtrs.push_back(pRubyBase);
-			RubySymbol::sSymbolLinks.push_back(new RubySymbol(paBuffer, bufferLength));
+			RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 
 			for (repCount = 0; repCount < val; ++repCount)
 			{
@@ -633,13 +621,15 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		else
 		{
 			++(*ppToken);
-			ProcessSymbol(ppToken, &paBuffer, &bufferLength);
-			paRubySymbol = new RubySymbol(paBuffer, bufferLength);
+			
+			paRubySymbol = ProcessSymbol(ppToken);
+			assert(paRubySymbol != nullptr);
+
 			RubySymbol::sSymbolLinks.push_back(paRubySymbol);
 
-			if ((bufferLength == 5 && memcmp(paBuffer, "Table", bufferLength) == 0)
-				|| (bufferLength == 5 && memcmp(paBuffer, "Color", bufferLength) == 0)
-				|| (bufferLength == 4 && memcmp(paBuffer, "Tone", bufferLength) == 0))
+			if (paRubySymbol->Name == "Table"
+				|| paRubySymbol->Name == "Color"
+				|| paRubySymbol->Name == "Tone")
 			{
 				char* paDataBuffer;
 				ProcessFixnum(ppToken, &val);
@@ -647,7 +637,7 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 				assert(paDataBuffer != nullptr);
 				memcpy(paDataBuffer, *ppToken, val);
 
-				RubyBase* paRubyUserDefined = new RubyUserDefined(paBuffer, bufferLength, paDataBuffer, val);
+				RubyBase* paRubyUserDefined = new RubyUserDefined(paRubySymbol->Name.c_str(), paRubySymbol->Name.size(), paDataBuffer, val);
 
 				currentObjectPtrs.push_back(paRubyUserDefined);
 				RubyObject::sObjectReferences.push_back(paRubyUserDefined);

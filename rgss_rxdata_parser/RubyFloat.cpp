@@ -7,20 +7,20 @@ const char RubyFloat::STATE_NAN[]        = { 'n' ,'a', 'n' };
 const char RubyFloat::STATE_INF[]        = { 'i', 'n', 'f' };
 const char RubyFloat::STATE_SIGNED_INF[] = { '-', 'i', 'n', 'f' };
 
-RubyFloat::RubyFloat(char* const paBytes, const size_t byteCount)
+RubyFloat::RubyFloat(char* const pBytes, const size_t byteCount)
 	: RubyBase(eRubyTokens::TYPE_FLOAT)
 {
-	if (byteCount == sizeof(STATE_NAN) && memcmp(paBytes, STATE_NAN, sizeof(STATE_NAN)) == 0)
+	if (byteCount == sizeof(STATE_NAN) && memcmp(pBytes, STATE_NAN, sizeof(STATE_NAN)) == 0)
 	{
 		State = eStates::Nan;
 		Value = -NAN;
 	}
-	else if (byteCount == sizeof(STATE_INF) && memcmp(paBytes, STATE_INF, sizeof(STATE_INF)) == 0)
+	else if (byteCount == sizeof(STATE_INF) && memcmp(pBytes, STATE_INF, sizeof(STATE_INF)) == 0)
 	{
 		State = eStates::Infinity;
 		Value = INFINITY;
 	}
-	else if (byteCount == sizeof(STATE_SIGNED_INF) && memcmp(paBytes, STATE_SIGNED_INF, sizeof(STATE_SIGNED_INF)) == 0)
+	else if (byteCount == sizeof(STATE_SIGNED_INF) && memcmp(pBytes, STATE_SIGNED_INF, sizeof(STATE_SIGNED_INF)) == 0)
 	{
 		State = eStates::SignedInfinity;
 		Value = -INFINITY;
@@ -28,7 +28,7 @@ RubyFloat::RubyFloat(char* const paBytes, const size_t byteCount)
 	else
 	{
 		State = eStates::Normal;
-		Value = std::stod(std::string(paBytes, byteCount));
+		Value = std::stod(std::string(pBytes, byteCount));
 	}
 
 	sObjectReferences.push_back(this);

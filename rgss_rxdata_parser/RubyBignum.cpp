@@ -6,5 +6,13 @@ RubyBignum::RubyBignum(const bool bSign, char* const bytes, const size_t byteLen
 	, PABytes(bytes)
 	, ByteLength(byteLength)
 {
+	PABytes = new char[byteLength];
+	memcpy(PABytes, bytes, byteLength);
+
 	sObjectReferences.push_back(this);
+}
+
+RubyBignum::~RubyBignum(void)
+{
+	delete[] PABytes;
 }
