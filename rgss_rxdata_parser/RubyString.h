@@ -4,8 +4,8 @@
 
 struct RubyString : public RubyBase
 {
-	RubyString(char* const paPtr, const size_t size);
+	RubyString(const char* paPtr, const size_t size);
 	
-	size_t Size;
+	std::string Value;
 };
 

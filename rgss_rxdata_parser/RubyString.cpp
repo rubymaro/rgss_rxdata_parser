@@ -1,8 +1,8 @@
 #include "RubyString.h"
 
-RubyString::RubyString(char* const paPtr, const size_t size)
-	: RubyBase(eRubyTokens::TYPE_STRING, paPtr)
-	, Size(size)
+RubyString::RubyString(const char* paPtr, const size_t size)
+	: RubyBase(eRubyTokens::TYPE_STRING, nullptr)
+	, Value(paPtr, size)
 {
 	sObjectReferences.push_back(this);
 }

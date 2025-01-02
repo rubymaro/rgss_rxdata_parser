@@ -4,6 +4,6 @@
 
 struct RubyFixnum : public RubyBase
 {
-	RubyFixnum(const int val);
+	RubyFixnum(const int32_t val);
 };
 

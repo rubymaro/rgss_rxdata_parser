@@ -1,10 +1,9 @@
 #include "RubyStruct.h"
 
-RubyStruct::RubyStruct(char* const paStructName, size_t structNameLength, std::vector<RubyBase*>* const paPtrs, const size_t length)
+RubyStruct::RubyStruct(const char* paStructName, const size_t structNameLength, std::vector<RubyBase*>* const paPtrs, const size_t length)
 	: RubyBase(eRubyTokens::TYPE_STRUCT, paPtrs)
+	, Name(paStructName, structNameLength)
 	, ChildLength(length)
-	, PAStructName(paStructName)
-	, StructNameLength(structNameLength)
 {
 	sObjectReferences.push_back(this);
 }

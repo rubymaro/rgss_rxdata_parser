@@ -4,10 +4,9 @@
 
 struct RubyUserDefined : public RubyBase
 {
-	RubyUserDefined(char* const paClassName, const size_t classNameLength, char* const paPtr, const size_t bufferLength);
+	RubyUserDefined(const char* paClassName, const size_t classNameLength, char* const paPtr, const size_t bufferLength);
 
-	char* PAClassName;
-	size_t ClassNameLength;
+	std::string ClassName;
 	size_t BufferLength;
 };
 

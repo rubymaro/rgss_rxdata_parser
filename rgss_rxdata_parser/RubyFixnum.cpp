@@ -1,6 +1,6 @@
 #include "RubyFixnum.h"
 
-RubyFixnum::RubyFixnum(const int val)
-	: RubyBase(eRubyTokens::TYPE_FIXNUM, new int(val))
+RubyFixnum::RubyFixnum(const int32_t val)
+	: RubyBase(eRubyTokens::TYPE_FIXNUM, new int32_t(val))
 {
 }

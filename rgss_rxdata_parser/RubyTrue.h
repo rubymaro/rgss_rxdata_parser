@@ -4,6 +4,6 @@
 
 struct RubyTrue : public RubyBase
 {
-	RubyTrue();
+	RubyTrue(void);
 };
 

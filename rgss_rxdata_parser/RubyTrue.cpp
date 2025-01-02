@@ -1,6 +1,6 @@
 #include "RubyTrue.h"
 
-RubyTrue::RubyTrue()
-	: RubyBase(eRubyTokens::TYPE_TRUE, new bool(true))
+RubyTrue::RubyTrue(void)
+	: RubyBase(eRubyTokens::TYPE_TRUE, nullptr)
 {
 }

@@ -1,10 +1,9 @@
 #include "RubyObject.h"
 #include "RubyClass.h"
 
-RubyObject::RubyObject(char* const paClassName, const size_t classNameLength, std::vector<RubyBase*>* const paPtrs, const size_t length, const bool bAddToRef)
+RubyObject::RubyObject(const char* paClassName, const size_t classNameLength, std::vector<RubyBase*>* const paPtrs, const size_t length, const bool bAddToRef)
 	: RubyBase(eRubyTokens::TYPE_OBJECT, paPtrs)
-	, PAClassName(paClassName)
-	, ClassNameLength(classNameLength)
+	, ClassName(std::string(paClassName, classNameLength))
 	, ChildLength(length)
 {
 	if (bAddToRef)

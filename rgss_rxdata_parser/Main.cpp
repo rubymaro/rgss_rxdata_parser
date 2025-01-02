@@ -588,7 +588,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 
 			paChildObjectPtrs = new std::vector<RubyBase*>();
 			paChildObjectPtrs->reserve(val);
-			currentObjectPtrs.push_back(new RubyObject((char*)pLinkedSymbol->PAPtr, pLinkedSymbol->SymbolNameLength, paChildObjectPtrs, val, true));
+			currentObjectPtrs.push_back(new RubyObject(pLinkedSymbol->Name.c_str(), pLinkedSymbol->Name.size(), paChildObjectPtrs, val, true));
 
 			for (repCount = 0; repCount < val; ++repCount)
 			{
@@ -618,9 +618,9 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 			ProcessFixnum(ppToken, &val);
 
 			RubySymbol* pRubyUserDefinedSymbol = RubySymbol::sSymbolLinks[val];
-			if ((pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Table", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
-				|| (pRubyUserDefinedSymbol->SymbolNameLength == 5 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Color", pRubyUserDefinedSymbol->SymbolNameLength) == 0)
-				|| (pRubyUserDefinedSymbol->SymbolNameLength == 4 && memcmp(pRubyUserDefinedSymbol->PAPtr, "Tone", pRubyUserDefinedSymbol->SymbolNameLength) == 0))
+			if (pRubyUserDefinedSymbol->Name == "Table"
+				|| pRubyUserDefinedSymbol->Name == "Color"
+				|| pRubyUserDefinedSymbol->Name == "Tone")
 			{
 				char* paDataBuffer;
 
@@ -629,7 +629,7 @@ bool ParseRecursive(unsigned char** ppToken, const unsigned char* const pEnd, st
 				assert(paDataBuffer != nullptr);
 				memcpy(paDataBuffer, *ppToken, val);
 
-				currentObjectPtrs.push_back(new RubyUserDefined((char*)pRubyUserDefinedSymbol->PAPtr, pRubyUserDefinedSymbol->SymbolNameLength, paDataBuffer, val));
+				currentObjectPtrs.push_back(new RubyUserDefined(pRubyUserDefinedSymbol->Name.c_str(), pRubyUserDefinedSymbol->Name.size(), paDataBuffer, val));
 
 				*ppToken += val;
 			}
@@ -757,9 +757,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_OBJECT:
-		wprintf(L"object of class ");
-		fwrite(static_cast<const RubyObject*>(pRubyBase)->PAClassName, sizeof(char), static_cast<const RubyObject*>(pRubyBase)->ClassNameLength, stdout);
-		wprintf(L"\n");
+		printf("object of class %s\n", static_cast<const RubyObject*>(pRubyBase)->ClassName.c_str());
 		for (RubyBase* pChild : *(std::vector<RubyBase*>*)(pRubyBase->PAPtr))
 		{
 			PrintRxdataRecursive(pChild, indent + 1);
@@ -769,11 +767,8 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_USERDEF:
-		wprintf(L"User-defined class ");
-		fwrite(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, sizeof(char), static_cast<const RubyUserDefined*>(pRubyBase)->ClassNameLength, stdout);
-		wprintf(L"\n");
-
-		if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Table", 5) == 0)
+		printf("User-defined class %s\n", static_cast<const RubyUserDefined*>(pRubyBase)->ClassName.c_str());
+		if (static_cast<const RubyUserDefined*>(pRubyBase)->ClassName == "Table")
 		{
 			RubyTable* pRubyTable;
 
@@ -826,7 +821,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 				}
 			}
 		}
-		else if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Color", 5) == 0)
+		else if (static_cast<const RubyUserDefined*>(pRubyBase)->ClassName == "Color")
 		{
 			RubyColor* pRubyColor;
 			pRubyColor = reinterpret_cast<RubyColor*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
@@ -842,7 +837,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 				static_cast<uint8_t>(pRubyColor->Alpha)
 			);
 		}
-		else if (memcmp(static_cast<const RubyUserDefined*>(pRubyBase)->PAClassName, "Tone", 4) == 0)
+		else if (static_cast<const RubyUserDefined*>(pRubyBase)->ClassName == "Tone")
 		{
 			RubyTone* pRubyTone;
 			pRubyTone = reinterpret_cast<RubyTone*>((static_cast<const RubyUserDefined*>(pRubyBase)->PAPtr));
@@ -869,9 +864,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 	case eRubyTokens::TYPE_BIGNUM:
 		break;
 	case eRubyTokens::TYPE_STRING:
-		wprintf(L"\"");
-		fwrite(static_cast<const RubyString*>(pRubyBase)->PAPtr, sizeof(char), static_cast<const RubyString*>(pRubyBase)->Size, stdout);
-		wprintf(L"\"\n");
+		printf("\"%s\"\n", static_cast<const RubyString*>(pRubyBase)->Value.c_str());
 		break;
 	case eRubyTokens::TYPE_REGEXP:
 		assert(0);
@@ -904,8 +897,7 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_STRUCT:
-		fwrite(static_cast<const RubyStruct*>(pRubyBase)->PAStructName, sizeof(char), static_cast<const RubyStruct*>(pRubyBase)->StructNameLength, stdout);
-		wprintf(L" = Struct.new\n{\n");
+		printf("%s = Struct.new\n{\n", static_cast<const RubyStruct*>(pRubyBase)->Name.c_str());
 		for (RubyBase* pChild : *(std::vector<RubyBase*>*)(pRubyBase->PAPtr))
 		{
 			PrintRxdataRecursive(pChild, indent + 1);
@@ -916,17 +908,13 @@ void PrintRxdataRecursive(const RubyBase* const pRubyBase, const int indent)
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_CLASS:
-		wprintf(L"class ");
-		fwrite(static_cast<const RubyClass*>(pRubyBase)->PAPtr, sizeof(char), static_cast<const RubyClass*>(pRubyBase)->ClassNameLength, stdout);
-		wprintf(L"\n");
+		printf("class %s\n", static_cast<const RubyClass*>(pRubyBase)->Name.c_str());
 		break;
 	case eRubyTokens::TYPE_MODULE:
 		assert(0);
 		break;
 	case eRubyTokens::TYPE_SYMBOL:
-		wprintf(L":");
-		fwrite(static_cast<const RubySymbol*>(pRubyBase)->PAPtr, sizeof(char), static_cast<const RubySymbol*>(pRubyBase)->SymbolNameLength, stdout);
-		wprintf(L"\n");
+		printf(":%s\n", static_cast<const RubySymbol*>(pRubyBase)->Name.c_str());
 		break;
 	case eRubyTokens::TYPE_SYMLINK:
 		assert(0);
