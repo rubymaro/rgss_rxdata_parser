@@ -13,7 +13,11 @@ RubyObject::~RubyObject(void)
 {
 	for (RubyBase* pRubyBase : ObjectElementPtrs)
 	{
-		delete pRubyBase;
+		--pRubyBase->RefCount;
+		if (pRubyBase->RefCount == 0)
+		{
+			delete pRubyBase;
+		}
 	}
 	ObjectElementPtrs.clear();
 }

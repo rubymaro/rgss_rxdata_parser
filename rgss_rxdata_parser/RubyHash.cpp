@@ -11,7 +11,11 @@ RubyHash::~RubyHash(void)
 {
 	for (RubyBase* pRubyBase : HashElementPtrs)
 	{
-		delete pRubyBase;
+		--pRubyBase->RefCount;
+		if (pRubyBase->RefCount == 0)
+		{
+			delete pRubyBase;
+		}
 	}
 	HashElementPtrs.clear();
 }

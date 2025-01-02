@@ -12,7 +12,11 @@ RubyStruct::~RubyStruct(void)
 {
 	for (RubyBase* pRubyBase : StructMemberPtrs)
 	{
-		delete pRubyBase;
+		--pRubyBase->RefCount;
+		if (pRubyBase->RefCount == 0)
+		{
+			delete pRubyBase;
+		}
 	}
 	StructMemberPtrs.clear();
 }

@@ -11,6 +11,7 @@ struct RubyBase
 	virtual ~RubyBase(void) = default;
 
 	eRubyTokens Type;
+	uint32_t RefCount;
 
 	static std::vector<RubyBase*> sObjectReferences;
 };

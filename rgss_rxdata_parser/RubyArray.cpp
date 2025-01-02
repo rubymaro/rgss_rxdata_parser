@@ -11,7 +11,11 @@ RubyArray::~RubyArray(void)
 {
 	for (RubyBase* pRubyBase : ArrayElementPtrs)
 	{
-		delete pRubyBase;
+		--pRubyBase->RefCount;
+		if (pRubyBase->RefCount == 0)
+		{
+			delete pRubyBase;
+		}
 	}
 	ArrayElementPtrs.clear();
 }

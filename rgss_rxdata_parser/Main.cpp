@@ -125,7 +125,11 @@ int32_t wmain(const int32_t argc, const wchar_t* argv[])
 
 				for (RubyBase* pRubyBase : rootObjectPtrs)
 				{
-					delete pRubyBase;
+					--pRubyBase->RefCount;
+					if (pRubyBase->RefCount == 0)
+					{
+						delete pRubyBase;
+					}
 				}
 				rootObjectPtrs.clear();
 
@@ -589,6 +593,7 @@ bool ParseRecursive(uint8_t** ppToken, const uint8_t* const pEnd, std::vector<Ru
 		++(*ppToken);
 		ProcessFixnum(ppToken, &val);
 		val += 1;
+		++RubyBase::sObjectReferences[val]->RefCount;
 		currentObjectPtrs.push_back(RubyBase::sObjectReferences[val]);
 		break;
 
